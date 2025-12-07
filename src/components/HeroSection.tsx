@@ -18,7 +18,7 @@ const HeroSection = () => {
         <h1
           className="mb-6 drop-shadow-gray-900 drop-shadow-2xl animate-fade-in font-serif text-4xl font-semibold leading-tight text-white opacity-0 sm:text-5xl md:text-6xl lg:text-7xl"
           style={{ animationDelay: '0.2s' }}
-        >Trade Physical Gold <br/>with Confidence</h1>
+        >Trade Physical&nbsp;Gold <br/>with Confidence</h1>
 
         <p
           className="mx-auto mb-10 max-w-2xl animate-fade-in font-sans text-lg text-white/80 opacity-0 sm:text-xl"
