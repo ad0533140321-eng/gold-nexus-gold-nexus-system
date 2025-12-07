@@ -10,19 +10,19 @@ export const Navbar = () => {
           <div className="flex items-center gap-8">
             <a
               href="#buy-gold"
-              className="font-medium text-[#1a202c] transition-colors hover:text-[#D4AF37]"
+              className="hidden md:block font-medium text-[#1a202c] transition-colors hover:text-[#D4AF37]"
             >
               Buy Gold
             </a>
             <a
               href="#sell-gold"
-              className="font-medium text-[#1a202c] transition-colors hover:text-[#D4AF37]"
+              className="hidden md:block font-medium text-[#1a202c] transition-colors hover:text-[#D4AF37]"
             >
               Sell Gold
             </a>
             <a
               href="#learn-more"
-              className="font-medium text-[#1a202c] transition-colors hover:text-[#D4AF37]"
+              className="hidden md:block font-medium text-[#1a202c] transition-colors hover:text-[#D4AF37]"
             >
               Learn More
             </a>
