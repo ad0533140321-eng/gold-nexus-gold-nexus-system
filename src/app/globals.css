@@ -306,3 +306,7 @@
     font-family: var(--font-sans);
   }
 }
+
+.bg-radial-gold {
+  background-image: radial-gradient(circle, #FCF8B8, #F4D361);
+}
