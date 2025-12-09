@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { ShoppingCart } from 'lucide-react';
 import { GoldTicker } from '@/components/GoldTicker';
+import Link from "next/link";
 
 export const Navbar = () => {
   return (
@@ -9,7 +10,9 @@ export const Navbar = () => {
       <nav className="border-b border-gray-200 bg-white shadow-sm">
         <div className="container mx-auto px-4">
           <div className="flex h-16 items-center justify-between">
-            <div className="font-serif text-2xl font-bold text-[#1a202c]">Gold Nexus</div>
+            <Link href="/">
+              <div className="font-serif text-2xl font-bold text-[#1a202c]">Gold Nexus</div>
+            </Link>
             <div className="flex items-center gap-8">
               <a
                 href="#buy-gold"
