@@ -4,18 +4,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import {CountryDropdown} from "@/components/ui/country-dropdown";
 
 export default function RegisterPage() {
   return (
     <div className="flex min-h-screen w-full items-center justify-center bg-[#F9F9F9] py-12">
-      <Card className="w-full max-w-sm border-neutral-300 bg-white shadow-none rounded-sm">
+      <Card className="w-full max-w-sm rounded-sm border-neutral-300 bg-white shadow-none">
         <CardHeader className="text-center">
           <CardTitle className="font-serif text-3xl tracking-tight">Create an Account</CardTitle>
           <CardDescription className="pt-2">
@@ -54,17 +48,7 @@ export default function RegisterPage() {
           </div>
           <div className="grid gap-2">
             <Label htmlFor="country">Country</Label>
-            <Select>
-              <SelectTrigger className="w-full rounded-md border-neutral-300 text-neutral-600">
-                <SelectValue placeholder="Select your country" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="us">United States</SelectItem>
-                <SelectItem value="ca">Canada</SelectItem>
-                <SelectItem value="gb">United Kingdom</SelectItem>
-                {/* Add other countries as needed */}
-              </SelectContent>
-            </Select>
+            <CountryDropdown />
           </div>
           <div className="grid gap-2">
             <Label htmlFor="phone-number">Phone Number</Label>
