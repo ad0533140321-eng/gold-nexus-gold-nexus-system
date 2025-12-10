@@ -1,3 +1,5 @@
+import Link from 'next/link'; // 1. Import the Link component
+
 export const Footer = () => {
   return (
     <footer className="bg-gray-900 py-16">
@@ -19,20 +21,21 @@ export const Footer = () => {
             </h4>
             <ul className="space-y-2">
               <li>
-                <a
-                  href="#"
+                {/* 2. Replace <a> with <Link> and update href */}
+                <Link
+                  href="/info/about-us"
                   className="font-sans text-sm text-neutral-400 transition-colors hover:text-neutral-200"
                 >
                   About Us
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link
+                  href="/info/contact"
                   className="font-sans text-sm text-neutral-400 transition-colors hover:text-neutral-200"
                 >
                   Contact
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -44,20 +47,20 @@ export const Footer = () => {
             </h4>
             <ul className="space-y-2">
               <li>
-                <a
-                  href="#"
+                <Link
+                  href="/info/secure-shipping"
                   className="font-sans text-sm text-neutral-400 transition-colors hover:text-neutral-200"
                 >
                   Secure Shipping
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link
+                  href="/info/how-to-sell"
                   className="font-sans text-sm text-neutral-400 transition-colors hover:text-neutral-200"
                 >
                   How to Sell
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -69,28 +72,28 @@ export const Footer = () => {
             </h4>
             <ul className="space-y-2">
               <li>
-                <a
-                  href="#"
+                <Link
+                  href="/info/terms-of-service"
                   className="font-sans text-sm text-neutral-400 transition-colors hover:text-neutral-200"
                 >
                   Terms of Service
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link
+                  href="/info/privacy-policy"
                   className="font-sans text-sm text-neutral-400 transition-colors hover:text-neutral-200"
                 >
                   Privacy Policy
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link
+                  href="/info/risk-disclosure"
                   className="font-sans text-sm text-neutral-400 transition-colors hover:text-neutral-200"
                 >
                   Risk Disclosure
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
