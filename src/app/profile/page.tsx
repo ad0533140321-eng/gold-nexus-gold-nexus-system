@@ -68,7 +68,7 @@ export default function MyAccountPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="country">Country</Label>
-                  <CountryDropdown defaultValue="USA" />
+                  <CountryDropdown />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="phone-number">Phone Number</Label>

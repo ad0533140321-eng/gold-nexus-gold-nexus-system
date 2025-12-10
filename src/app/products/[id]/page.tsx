@@ -8,7 +8,7 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion"
+} from '@/components/ui/accordion';
 
 export default function ProductDetailPage({ params }: { params: { id: string } }) {
   // In a real app, you would fetch this data based on params.id
@@ -32,11 +32,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
         {/* LEFT COLUMN: IMAGE */}
         <div className="flex items-start justify-center">
           <div className="w-full max-w-md overflow-hidden rounded-lg border border-border/50 bg-card p-4 shadow-subtle">
-            <Image
-              src={oneOz}
-              alt={productData.name}
-              className="h-full w-full object-contain"
-            />
+            <Image src={oneOz} alt={productData.name} className="h-full w-full object-contain" />
           </div>
         </div>
 
@@ -83,38 +79,68 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
 
       {/* ACCORDION SECTION (Replaces Tabs) */}
       <div className="mt-16 border-t border-border/50 pt-12">
-        <Accordion type="single" collapsible defaultValue="description" className="w-full max-w-2xl">
-
+        <Accordion
+          type="single"
+          collapsible
+          defaultValue="description"
+          className="w-full max-w-2xl"
+        >
           <AccordionItem value="description">
-            <AccordionTrigger className="font-serif text-lg">Full Product Description</AccordionTrigger>
-            <AccordionContent className="text-muted-foreground text-sm leading-relaxed">
+            <AccordionTrigger className="font-serif text-lg">
+              Full Product Description
+            </AccordionTrigger>
+            <AccordionContent className="text-sm leading-relaxed text-muted-foreground">
               <p>{productData.description}</p>
-              <p className="mt-4">This investment-grade gold bar is manufactured to the highest standards of the London Bullion Market Association (LBMA). Each bar undergoes rigorous quality control to ensure it meets the exacting specifications required for international trade and investment portfolios.</p>
+              <p className="mt-4">
+                This investment-grade gold bar is manufactured to the highest standards of the
+                London Bullion Market Association (LBMA). Each bar undergoes rigorous quality
+                control to ensure it meets the exacting specifications required for international
+                trade and investment portfolios.
+              </p>
             </AccordionContent>
           </AccordionItem>
 
           <AccordionItem value="specs">
-            <AccordionTrigger className="font-serif text-lg">Technical Specifications</AccordionTrigger>
-            <AccordionContent className="grid grid-cols-1 gap-8 md:grid-cols-2 pt-4">
-              <div className="rounded-lg border border-border/30 p-6 bg-secondary/50">
+            <AccordionTrigger className="font-serif text-lg">
+              Technical Specifications
+            </AccordionTrigger>
+            <AccordionContent className="grid grid-cols-1 gap-8 pt-4 md:grid-cols-2">
+              <div className="rounded-lg border border-border/30 bg-secondary/50 p-6">
                 <h4 className="font-serif font-medium">Physical Properties</h4>
                 <dl className="mt-4 text-sm">
-                  <div className="flex justify-between py-2"><dt>Gross Weight</dt><dd>{productData.weight}</dd></div>
-                  <div className="flex justify-between py-2"><dt>Fineness</dt><dd>{productData.purity}</dd></div>
-                  <div className="flex justify-between py-2"><dt>Dimensions</dt><dd>{productData.dimensions}</dd></div>
+                  <div className="flex justify-between py-2">
+                    <dt>Gross Weight</dt>
+                    <dd>{productData.weight}</dd>
+                  </div>
+                  <div className="flex justify-between py-2">
+                    <dt>Fineness</dt>
+                    <dd>{productData.purity}</dd>
+                  </div>
+                  <div className="flex justify-between py-2">
+                    <dt>Dimensions</dt>
+                    <dd>{productData.dimensions}</dd>
+                  </div>
                 </dl>
               </div>
-              <div className="rounded-lg border border-border/50 p-6 bg-secondary/50">
+              <div className="rounded-lg border border-border/50 bg-secondary/50 p-6">
                 <h4 className="font-serif font-medium">Certification</h4>
                 <dl className="mt-4 text-sm">
-                  <div className="flex justify-between py-2"><dt>Manufacturer</dt><dd>{productData.vendorName}</dd></div>
-                  <div className="flex justify-between py-2"><dt>LBMA Approved</dt><dd>Yes</dd></div>
-                  <div className="flex justify-between py-2"><dt>Serial Number</dt><dd>Included</dd></div>
+                  <div className="flex justify-between py-2">
+                    <dt>Manufacturer</dt>
+                    <dd>{productData.vendorName}</dd>
+                  </div>
+                  <div className="flex justify-between py-2">
+                    <dt>LBMA Approved</dt>
+                    <dd>Yes</dd>
+                  </div>
+                  <div className="flex justify-between py-2">
+                    <dt>Serial Number</dt>
+                    <dd>Included</dd>
+                  </div>
                 </dl>
               </div>
             </AccordionContent>
           </AccordionItem>
-
         </Accordion>
       </div>
     </main>

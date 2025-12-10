@@ -4,11 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {CountryDropdown} from "@/components/ui/country-dropdown";
+import { CountryDropdown } from '@/components/ui/country-dropdown';
 
 export default function RegisterPage() {
   return (
-    <div className="flex min-h-screen w-full px-4 md:px-0 items-center justify-center bg-[#F9F9F9] py-12">
+    <div className="flex min-h-screen w-full items-center justify-center bg-[#F9F9F9] px-4 py-12 md:px-0">
       <Card className="w-full max-w-sm rounded-sm border-neutral-300 bg-white shadow-none">
         <CardHeader className="text-center">
           <CardTitle className="font-serif text-3xl tracking-tight">Create an Account</CardTitle>
@@ -48,7 +48,7 @@ export default function RegisterPage() {
           </div>
           <div className="grid gap-2">
             <Label htmlFor="country">Country</Label>
-            <CountryDropdown defaultValue="USA" />
+            <CountryDropdown />
           </div>
           <div className="grid gap-2">
             <Label htmlFor="phone-number">Phone Number</Label>

@@ -50,7 +50,7 @@ const CountryDropdownComponent = (
       (country: Country) => country.emoji && country.status !== 'deleted' && country.ioc !== 'PRK'
     ),
     onChange,
-    defaultValue,
+    defaultValue = 'USA',
     disabled = false,
     placeholder = 'Select a country',
     slim = false,

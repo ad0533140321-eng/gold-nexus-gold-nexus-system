@@ -133,7 +133,6 @@ export default function MarketplacePage() {
           </section>
         </div>
       </main>
-      <Footer />
     </div>
   );
 }

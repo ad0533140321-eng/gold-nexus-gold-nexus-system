@@ -1,4 +1,4 @@
-import Image from "next/image";
+import Image from 'next/image';
 import shield from '@/assets/mocks/shield.png';
 import medal from '@/assets/mocks/medal.png';
 import zap from '@/assets/mocks/zap.png';
@@ -31,16 +31,18 @@ export const TrustIndicators = () => {
           return (
             <div
               key={i}
-              className={`flex flex-col gap-8 rounded-2xl bg-gradient-to-b border border-gray-700 from-[#4F411B] to-[#1A180F] p-8 pb-0 shadow-sm md:flex-row md:items-center md:justify-between ${reversed ? 'md:flex-row-reverse' : ''} `}
+              className={`flex flex-col gap-8 rounded-2xl border border-gray-700 bg-gradient-to-b from-[#4F411B] to-[#1A180F] p-8 pb-0 shadow-sm md:flex-row md:items-center md:justify-between ${reversed ? 'md:flex-row-reverse' : ''} `}
             >
               {/* TEXT */}
               <div className="flex-1 text-left">
-                <h3 className="mb-3 font-serif text-2xl tracking-wide font-black text-white">{item.title}</h3>
+                <h3 className="mb-3 font-serif text-2xl font-black tracking-wide text-white">
+                  {item.title}
+                </h3>
                 <p className="leading-relaxed text-white/70">{item.desc}</p>
               </div>
-              <div className=" flex-1 flex justify-center md:justify-end">
-                <div className="max-w-[500px] w-full">
-                  <Image src={item.image} alt="shield" className="w-full h-auto" />
+              <div className="flex flex-1 justify-center md:justify-end">
+                <div className="w-full max-w-[500px]">
+                  <Image src={item.image} alt="shield" className="h-auto w-full" />
                 </div>
               </div>
             </div>

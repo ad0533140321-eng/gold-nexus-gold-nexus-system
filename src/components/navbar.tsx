@@ -15,13 +15,13 @@ export const Navbar = () => {
             </Link>
             <div className="flex items-center gap-8">
               <a
-                href="#buy-gold"
+                href="/marketplace"
                 className="hidden font-medium text-[#1a202c] transition-colors hover:text-[#D4AF37] md:block"
               >
                 Buy Gold
               </a>
               <a
-                href="#sell-gold"
+                href="/sell-gold"
                 className="hidden font-medium text-[#1a202c] transition-colors hover:text-[#D4AF37] md:block"
               >
                 Sell Gold

@@ -15,7 +15,7 @@ export const FilterSidebar = ({
   onClear,
 }: FilterSidebarProps) => {
   return (
-    <div className="flex h-full lg:h-auto flex-col rounded-lg border border-border/50 bg-secondary/30 p-6">
+    <div className="flex h-full flex-col rounded-lg border border-border/50 bg-secondary/30 p-6 lg:h-auto">
       <div className="flex-grow">
         <h3 className="mb-6 font-serif text-xl font-medium">Asset Class</h3>
         <div className="space-y-3">

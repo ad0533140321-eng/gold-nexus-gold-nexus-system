@@ -1,5 +1,3 @@
-
-
 # QC Checklist (Before Delivery)
 
 - [ ] **speed:** compress all images in resolution and tinypng

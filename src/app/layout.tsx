@@ -4,7 +4,7 @@ import './globals.css';
 import localFont from 'next/font/local';
 import { Navbar } from '@/components/navbar';
 import { Footer } from '@/components/Footer';
-import { NuqsAdapter } from 'nuqs/adapters/next/app'
+import { NuqsAdapter } from 'nuqs/adapters/next/app';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
