@@ -1,7 +1,4 @@
 import React from 'react';
-import { TermsContent } from '@/lib/info-pages-content/TermsContent';
-import { RiskContent } from '@/lib/info-pages-content/RiskContent';
-import { PrivacyContent } from '@/lib/info-pages-content/PrivacyContent';
 
 interface PageContent {
   title: string;
@@ -9,40 +6,61 @@ interface PageContent {
 }
 
 export const pages: Record<string, PageContent> = {
-  // ... (your other pages like about-us, contact, etc.)
+  // Support Slugs
+  'ai-support': {
+    title: 'AI Customer Service',
+    content: <p>Content for the &#34;AI Customer Service&#34; page is pending.</p>,
+  },
+  'support-ticket': {
+    title: 'Open Support Ticket',
+    content: <p>Content for the &#34;Open Support Ticket&#34; page is pending.</p>,
+  },
+  faq: {
+    title: 'FAQ & Knowledge Base',
+    content: <p>Content for the &#34;FAQ & Knowledge Base&#34; page is pending.</p>,
+  },
+
+  // Company Slugs
   'about-us': {
     title: 'About Us',
-    content: <p>Content for About Us page is pending...</p>,
+    content: <p>Content for the &#34;About Us&#34; page is pending.</p>,
   },
-  contact: {
-    title: 'Contact Us',
-    content: <p>Content for Contact page is pending...</p>,
+  terms: {
+    title: 'Terms & Conditions',
+    content: <p>Content for the &#34;Terms & Conditions&#34; page is pending.</p>,
   },
-  'secure-shipping': {
-    title: 'Secure shipping',
-    content: <p>Secure shipping page is pending...</p>,
-  },
-  'how-to-sell': {
-    title: 'How to Sell Your Gold',
-    content: <p>How to Sell Your Gold page is pending...</p>,
-  },
-  // ... and so on for the other simple pages
-  'terms-of-service': {
-    title: 'Terms of Service',
-    content: <TermsContent />,
-  },
-  'privacy-policy': {
+  privacy: {
     title: 'Privacy Policy',
-    content: <PrivacyContent />,
+    content: <p>Content for the &#34;Privacy Policy&#34; page is pending.</p>,
   },
-  'risk-disclosure': {
-    title: 'Risk Disclosure',
-    content: <RiskContent />,
+  compliance: {
+    title: 'Compliance & AML / KYC',
+    content: <p>Content for the &#34;Compliance & AML / KYC&#34; page is pending.</p>,
+  },
+  'secure-trading': {
+    title: 'Secure Trading Environment',
+    content: <p>Content for the &#34;Secure Trading Environment&#34; page is pending.</p>,
+  },
+
+  // Services Slugs
+  'live-price-feed': {
+    title: 'Live Gold Price Feed',
+    content: <p>Content for the &#34;Live Gold Price Feed&#34; page is pending.</p>,
+  },
+  verification: {
+    title: 'Certified Jewelry Verification',
+    content: <p>Content for the &#34;Certified Jewelry Verification&#34; page is pending.</p>,
+  },
+  'buyer-protection': {
+    title: 'Insurance & Buyer Protection',
+    content: <p>Content for the &#34;Insurance & Buyer Protection&#34; page is pending.</p>,
+  },
+  'global-checkout': {
+    title: 'Seamless Global Checkout',
+    content: <p>Content for the &#34;Seamless Global Checkout&#34; page is pending.</p>,
   },
 };
 
 export const getPageContent = (slug: string): PageContent | null => {
   return pages[slug] || null;
 };
-
-// --- PASTE THE FULL COMPONENT CODE FROM STEP 2 BELOW ---
