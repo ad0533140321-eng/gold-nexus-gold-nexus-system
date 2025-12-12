@@ -8,7 +8,10 @@
     "start": "next start",
     "lint": "eslint",
     "format": "prettier --write .",
-    "db": "docker-compose up -d"
+    "db": "docker-compose up -d",
+    "prisma:gen": "npx prisma generate",
+    "prisma:push": "npx prisma db push",
+    "prisma:studio": "npx prisma studio"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.1.0",
