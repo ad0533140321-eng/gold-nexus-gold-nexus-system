@@ -10,7 +10,8 @@
     "format": "prettier --write .",
     "db": "docker-compose up -d",
     "prisma:gen": "npx prisma generate",
-    "prisma:push": "npx prisma db push",
+    "// dont use this when you have data in the db! - prisma:push": "npx prisma db push",
+    "prisma:migrate": "npx prisma migrate dev",
     "prisma:studio": "npx prisma studio"
   },
   "dependencies": {
