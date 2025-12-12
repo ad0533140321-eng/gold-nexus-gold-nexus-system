@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 import * as jwt from 'jsonwebtoken';
 import fs from 'fs';
 import path from 'path';
-import { User, Role } from '@/../src/generated/prisma/client'; // Import the User and Role types from Prisma
+import { User, Role } from '@/generated/prisma/client'; // Import the User and Role types from Prisma
 
 // Load the keys once and reuse them
 const privateKey =
