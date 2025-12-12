@@ -1,0 +1,21 @@
+# docker-compose.yml
+
+version: '3.8'
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: gold-nexus-db
+    restart: always
+    environment:
+      - POSTGRES_USER=goldnexus
+      - POSTGRES_PASSWORD=mysecretpassword
+      - POSTGRES_DB=goldnexus_db
+    ports:
+      # We map port 5433 on your Mac to port 5432 inside the container.
+      # This avoids conflicts if you ever have another Postgres app.
+      - '5433:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

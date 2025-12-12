@@ -1,0 +1,110 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Enums for status fields
+enum Role {
+  USER
+  ADMIN
+}
+enum StockStatus {
+  IN_STOCK
+  OUT_OF_STOCK
+}
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  COMPLETED
+  FAILED
+}
+
+enum LeadStatus {
+  SUBMITTED
+  CONTACTED
+  CLOSED
+}
+
+// --- CORE MODELS ---
+model User {
+  id          String   @id @default(uuid())
+  email       String   @unique
+  fullName    String
+  country     String
+  phoneNumber String
+  password    String
+  role        Role     @default(USER)
+  orders      Order[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Product {
+  id            String      @id @default(uuid())
+  sku           String      @unique
+  name          String
+  description   String?     @db.Text
+  price         Decimal     @db.Decimal(10, 2)
+  weight        String
+  karat         String
+  category      String
+  imageUrl      String
+  vendorName    String
+  stockStatus   StockStatus @default(IN_STOCK)
+  isActive      Boolean     @default(true)
+  orderItems    OrderItem[]
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model Order {
+  id                    String      @id @default(uuid())
+  userId                String
+  user                  User        @relation(fields: [userId], references: [id])
+  totalAmount           Decimal     @db.Decimal(10, 2)
+  currency              String      @default("USD")
+  // shippingAddressJson   String      @db.Json
+  status                OrderStatus @default(PENDING)
+  stripePaymentIntentId String?     @unique
+  items                 OrderItem[]
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+}
+
+model OrderItem {
+  id              String  @id @default(uuid())
+  orderId         String
+  order           Order   @relation(fields: [orderId], references: [id])
+  productId       String
+  product         Product @relation(fields: [productId], references: [id])
+  quantity        Int
+  priceAtPurchase Decimal @db.Decimal(10, 2)
+  @@unique([orderId, productId])
+}
+
+model SecondHandLead {
+  id              String     @id @default(uuid())
+  fullName        String
+  email           String
+  phoneNumber     String
+  country         String
+  city            String
+  itemType        String
+  estimatedWeight String
+  estimatedKarat  String
+  photoUrls       Json       @default("[]")
+  status          LeadStatus @default(SUBMITTED)
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+}
