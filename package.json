@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "DATABASE_URL=\"$DATABASE_SEED_AND_MIGRATION_URL\" prisma migrate deploy && next build",
     "start": "next start",
     "lint": "eslint",
     "format": "prettier --write .",
@@ -14,7 +14,10 @@
     "prisma:migrate": "npx prisma migrate dev",
     "prisma:studio": "npx prisma studio",
     "db:seed": "npx prisma db seed",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "// --- Staging (Supabase) DB Scripts ---": "",
+    "db:migrate:stg": "dotenv -e .env.staging -- sh -c 'DATABASE_URL=\"$DATABASE_SEED_AND_MIGRATION_URL\" prisma migrate deploy'",
+    "db:seed:stg": "dotenv -e .env.staging -- sh -c 'DATABASE_URL=\"$DATABASE_SEED_AND_MIGRATION_URL\" tsx prisma/seed.ts'"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -58,6 +61,7 @@
     "@types/pg": "^8.16.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv-cli": "^11.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.0.7",
     "prettier": "^3.7.4",
