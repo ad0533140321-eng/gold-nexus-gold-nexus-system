@@ -63,10 +63,10 @@ Build and deliver a Phase A MVP for Gold Nexus LLC, a global digital platform fo
     - `[x]` Zustand store created.
     - `[x]` "Add to Order" button works.
     - `[x]` Cart sheet reads from the store and is fully interactive (update quantity, remove).
-- `[ ]` **Create an Order (Checkout Process):**
-    - `[ ]` Build `POST /api/orders/create` endpoint to save cart contents to the database.
-- `[ ]` **Conditional Navbar UI:**
-    - `[ ]` Show "My Account" / "Logout" if authenticated, otherwise show "Login".
+- `[x]` **Create an Order (Checkout Process):**
+    - `[x]` Build `POST /api/orders/create` endpoint to save cart contents to the database.
+- `[x]` **Conditional Navbar UI:**
+    - `[x]` Show "My Account" / "Logout" if authenticated, otherwise show "Login".
 - `[ ]` **"Sell Gold" Form Submission (API):**
     - `[ ]` Build `POST /api/leads` endpoint and connect the frontend form.
 - `[ ]` **Admin Panel Backend APIs:**
