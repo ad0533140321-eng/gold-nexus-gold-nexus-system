@@ -69,16 +69,16 @@ Build and deliver a Phase A MVP for Gold Nexus LLC, a global digital platform fo
     - `[x]` Show "My Account" / "Logout" if authenticated, otherwise show "Login".
 - `[x]` **skeletons for pages with data**
   - `[x]` make a report on all pages that need a few secs to load and add loading state for them.
-- `[ ]` **marketplace filtering and sorting**
-  - `[ ]` support filtering and sorting the marketplace via the api.
+- `[x]` **marketplace filtering and sorting**
+  - `[x]` support filtering and sorting the marketplace via the api.
+- `[x]` **Live Gold Price Module (API):**
+  - `[x]` Build `GET /api/gold-price` endpoint. https://forex-data-feed.swissquote.com/public-quotes/bboquotes/instrument/XAU/USD
 - `[ ]` **"Sell Gold" Form Submission (API):**
     - `[ ]` Build `POST /api/leads` endpoint and connect the frontend form.
 - `[ ]` **Admin Panel Backend APIs:**
     - `[ ]` Product Management (Create, Update, Bulk Import).
     - `[ ]` Order Management (View all orders).
     - `[ ]` Lead Management (View all leads).
-- `[ ]` **Live Gold Price Module (API):**
-    - `[ ]` Build `GET /api/gold-price` endpoint. https://forex-data-feed.swissquote.com/public-quotes/bboquotes/instrument/XAU/USD
 - `[ ]` **Editable User Profile:**
     - `[ ]` Build `PUT /api/users/me` endpoint and enable the "Save Changes" form.
 

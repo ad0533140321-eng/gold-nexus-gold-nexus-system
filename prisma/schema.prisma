@@ -114,3 +114,11 @@ model SecondHandLead {
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
 }
+
+// --- LIVE GOLD PRICE ---
+model GoldPrice {
+  id            String    @id
+  currentPrice  Decimal   @db.Decimal(10, 3)
+  previousPrice Decimal   @db.Decimal(10, 3)
+  updatedAt     DateTime  @updatedAt
+}
