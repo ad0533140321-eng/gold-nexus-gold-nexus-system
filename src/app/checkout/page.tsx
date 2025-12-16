@@ -103,6 +103,7 @@ const CheckoutForm = () => {
     } catch (error) {
       console.error('Failed to process payment:', error);
       // TODO: Replace with a more user-friendly notification (e.g., a Toast)
+      // @ts-expect-error an error bro.
       alert(`Error: ${error.message}`);
     }
   };

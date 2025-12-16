@@ -19,6 +19,7 @@ import { countries } from 'country-data-list';
 
 import { UserProfile, OrderWithItems } from '@/lib/types';
 import { getOrderStatusVariant } from '@/lib/statusUtils';
+import ProfilePageLoading from '@/app/profile/loading';
 
 export default function MyAccountPage() {
   const [user, setUser] = useState<UserProfile | null>(null);
@@ -48,9 +49,10 @@ export default function MyAccountPage() {
     ? countries.all.find((c) => c.name === user.country)
     : undefined;
 
-  if (loading) {
-    return <div className="p-12 text-center">Loading account details...</div>;
+  if(loading){
+    return <ProfilePageLoading/>;
   }
+
   if (error) {
     return <div className="p-12 text-center text-red-500">Error: {error}</div>;
   }
