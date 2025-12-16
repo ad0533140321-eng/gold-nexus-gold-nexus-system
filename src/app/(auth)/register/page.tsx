@@ -25,8 +25,13 @@ const registerSchema = z.object({
 // Infer the TypeScript type from the Zod schema
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
+import { useAuthStore } from '@/lib/store/auth';
+
+// ... (other imports)
+
 export default function RegisterPage() {
   const router = useRouter();
+  const { login } = useAuthStore();
 
   // Set up the useForm hook with the Zod resolver
   const {
@@ -58,6 +63,7 @@ export default function RegisterPage() {
       });
 
       if (res.status === 201) {
+        login(); // Immediately update the global auth state
         router.push('/profile');
       } else {
         const responseData = await res.json();

@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Image from 'next/image';
+import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -14,55 +15,97 @@ import { formatCurrency } from '@/lib/utils/formatCurrency';
 import { CountryDropdown, Country } from '@/components/ui/country-dropdown';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { countrySchema } from '@/lib/zod-schemas/countrySchema';
 import { Skeleton } from '@/components/ui/skeleton';
+import { shippingSchema, ShippingFormValues } from '@/lib/zod-schemas/shippingSchema';
 
-const shippingSchema = z.object({
-  fullName: z.string().min(2, 'Full name is required'),
-  address: z.string().min(5, 'A valid address is required'),
-  apartment: z.string().optional(),
-  city: z.string().min(2, 'City is required'),
-  country: countrySchema,
-  state: z.string().min(2, 'State / Province is required'),
-  postalCode: z.string().min(4, 'A valid postal code is required'),
-});
-
-type ShippingFormValues = z.infer<typeof shippingSchema>;
+import { useAuthStore } from '@/lib/store/auth';
 
 export default function CheckoutPage() {
   const [isHydrated, setIsHydrated] = useState(false);
   const { items } = useCartStore();
+  const { isLoggedIn, isLoading: isAuthLoading } = useAuthStore();
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsHydrated(true);
   }, []);
 
+  // Show skeleton while checking auth status OR rehydrating the cart
+  if (isAuthLoading || !isHydrated) {
+    return <CheckoutSkeleton />;
+  }
+
+  // If cart is empty, show the empty state regardless of auth status
+  if (isHydrated && items.length === 0) {
+    return <EmptyCart />;
+  }
+
+  // If cart has items but user is not logged in, show the login prompt
+  if (!isLoggedIn) {
+    return <PleaseLogin />;
+  }
+
+  // If all checks pass, render the actual checkout form
+  return <CheckoutForm />;
+}
+
+// --- SUB-COMPONENTS ---
+
+const CheckoutForm = () => {
+  const { items } = useCartStore();
   const {
     register,
     handleSubmit,
     control,
     formState: { errors, isSubmitting },
-  } = useForm<ShippingFormValues>();
+  } = useForm<ShippingFormValues>({
+    resolver: zodResolver(shippingSchema),
+    // You can set default values here if needed
+  });
 
   const subtotal = items.reduce((acc, item) => acc + Number(item.price) * item.quantity, 0);
   const total = subtotal;
 
-  const onConfirmAndPay = (data: ShippingFormValues) => {
-    console.log('Shipping Info:', data);
-    console.log('Cart Items:', items);
-    // Next step: API call to create order will happen here
+  const { clearCart } = useCartStore.getState();
+  const router = useRouter();
+
+  const onConfirmAndPay = async (data: ShippingFormValues) => {
+    try {
+      // Normalize the data on the frontend before sending
+      const payload = {
+        shippingAddress: {
+          ...data,
+          country: data.country.name, // Send only the country name string
+        },
+        cartItems: items.map(item => ({ id: item.id, quantity: item.quantity })),
+      };
+
+      const response = await fetch('/api/orders/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to create order');
+      }
+
+      const { checkoutUrl } = await response.json();
+      
+      // Clear the cart *after* successfully creating the order
+      clearCart();
+
+      // Redirect to Stripe (or our mock success page)
+      router.push(checkoutUrl);
+
+    } catch (error) {
+      console.error('Failed to process payment:', error);
+      // TODO: Replace with a more user-friendly notification (e.g., a Toast)
+      alert(`Error: ${error.message}`);
+    }
   };
-
-  if (!isHydrated) {
-    return <CheckoutSkeleton />;
-  }
-
-  if (isHydrated && items.length === 0) {
-    return <EmptyCart />;
-  }
-
   return (
     <div className="min-h-screen w-full bg-[#F9F9F9] px-4 py-12 sm:px-6 lg:px-8">
       <main className="mx-auto max-w-6xl">
@@ -75,13 +118,11 @@ export default function CheckoutPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {/* Added form ID */}
               <form
                 id="shipping-form"
                 onSubmit={handleSubmit(onConfirmAndPay)}
                 className="space-y-6"
               >
-                {/* --- THIS IS THE FULL, CORRECTED FORM --- */}
                 <div className="space-y-2">
                   <Label htmlFor="full-name">Full Name</Label>
                   <Input
@@ -230,80 +271,106 @@ export default function CheckoutPage() {
       </main>
     </div>
   );
-}
+};
+
+const PleaseLogin = () => {
+  const searchParams = useSearchParams();
+  const returnUrl = searchParams.get('returnUrl') || '/checkout';
+
+  return (
+    <div className="flex min-h-[60vh] flex-col items-center justify-center gap-6 text-center">
+      <Lock className="h-20 w-20 text-gray-300" />
+      <div>
+        <h2 className="font-serif text-3xl font-medium">Please Log In to Continue</h2>
+        <p className="mt-2 text-muted-foreground">You need an account to complete your purchase.</p>
+      </div>
+      <div className="flex gap-4">
+        <Link href={`/login?redirect=${returnUrl}`}>
+          <Button className="rounded-md bg-black font-semibold text-white hover:bg-neutral-800">
+            Login
+          </Button>
+        </Link>
+        <Link href={`/register?redirect=${returnUrl}`}>
+          <Button variant="outline" className="rounded-md">
+            Sign Up
+          </Button>
+        </Link>
+      </div>
+    </div>
+  );
+};
 
 const EmptyCart = () => (
-  <div className="flex min-h-[60vh] flex-col items-center justify-center gap-6 text-center">
-    <ShoppingCart className="h-20 w-20 text-gray-300" />
-    <div>
-      <h2 className="font-serif text-3xl font-medium">Your Cart is Empty</h2>
-      <p className="mt-2 text-muted-foreground">You can&#39;t proceed to checkout without any items.</p>
-    </div>
-    <Link href="/marketplace">
-      <Button className="rounded-md bg-black font-semibold text-white hover:bg-neutral-800">
-        Return to Marketplace
-      </Button>
-    </Link>
-  </div>
-);
-
-const CheckoutSkeleton = () => (
-  <div className="min-h-screen w-full animate-pulse bg-[#F9F9F9] px-4 py-12 sm:px-6 lg:px-8">
-    <main className="mx-auto max-w-6xl">
-      <Skeleton className="mb-8 h-12 w-1/3" />
-      <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:items-start">
-        <Card className="border-neutral-200 bg-white shadow-none">
-          <CardHeader>
-            <Skeleton className="h-8 w-1/2" />
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="space-y-2">
-              <Skeleton className="h-4 w-1/4" />
-              <Skeleton className="h-10 w-full" />
-            </div>
-            <div className="space-y-2">
-              <Skeleton className="h-4 w-1/4" />
-              <Skeleton className="h-10 w-full" />
-            </div>
-            <div className="grid grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-1/3" />
-                <Skeleton className="h-10 w-full" />
-              </div>
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-1/3" />
-                <Skeleton className="h-10 w-full" />
-              </div>
-            </div>
-            {/* --- THIS IS THE FIX: REMOVED THE STRAY </form> TAG --- */}
-          </CardContent>
-        </Card>
-        <Card className="border-neutral-200 bg-white shadow-none">
-          <CardHeader>
-            <Skeleton className="h-8 w-1/2" />
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="flex items-center gap-4">
-              <Skeleton className="h-16 w-16 rounded-md" />
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-48" />
-                <Skeleton className="h-3 w-16" />
-              </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <Skeleton className="h-16 w-16 rounded-md" />
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-48" />
-                <Skeleton className="h-3 w-16" />
-              </div>
-            </div>
-            <Separator />
-            <Skeleton className="h-10 w-full" />
-            <Separator />
-            <Skeleton className="h-12 w-full" />
-          </CardContent>
-        </Card>
+    <div className="flex min-h-[60vh] flex-col items-center justify-center gap-6 text-center">
+      <ShoppingCart className="h-20 w-20 text-gray-300" />
+      <div>
+        <h2 className="font-serif text-3xl font-medium">Your Cart is Empty</h2>
+        <p className="mt-2 text-muted-foreground">You can&#39;t proceed to checkout without any items.</p>
       </div>
-    </main>
-  </div>
-);
+      <Link href="/marketplace">
+        <Button className="rounded-md bg-black font-semibold text-white hover:bg-neutral-800">
+          Return to Marketplace
+        </Button>
+      </Link>
+    </div>
+  );
+  
+  const CheckoutSkeleton = () => (
+    <div className="min-h-screen w-full animate-pulse bg-[#F9F9F9] px-4 py-12 sm:px-6 lg:px-8">
+      <main className="mx-auto max-w-6xl">
+        <Skeleton className="mb-8 h-12 w-1/3" />
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:items-start">
+          <Card className="border-neutral-200 bg-white shadow-none">
+            <CardHeader>
+              <Skeleton className="h-8 w-1/2" />
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-1/4" />
+                <Skeleton className="h-10 w-full" />
+              </div>
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-1/4" />
+                <Skeleton className="h-10 w-full" />
+              </div>
+              <div className="grid grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-1/3" />
+                  <Skeleton className="h-10 w-full" />
+                </div>
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-1/3" />
+                  <Skeleton className="h-10 w-full" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="border-neutral-200 bg-white shadow-none">
+            <CardHeader>
+              <Skeleton className="h-8 w-1/2" />
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="flex items-center gap-4">
+                <Skeleton className="h-16 w-16 rounded-md" />
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-48" />
+                  <Skeleton className="h-3 w-16" />
+                </div>
+              </div>
+              <div className="flex items-center gap-4">
+                <Skeleton className="h-16 w-16 rounded-md" />
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-48" />
+                  <Skeleton className="h-3 w-16" />
+                </div>
+              </div>
+              <Separator />
+              <Skeleton className="h-10 w-full" />
+              <Separator />
+              <Skeleton className="h-12 w-full" />
+            </CardContent>
+          </Card>
+        </div>
+      </main>
+    </div>
+  );

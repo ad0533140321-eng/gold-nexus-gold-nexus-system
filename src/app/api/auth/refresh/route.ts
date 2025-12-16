@@ -1,9 +1,8 @@
 // app/api/auth/refresh/route.ts
-import fs from 'fs';
-import path from 'path';
 import { NextRequest, NextResponse } from 'next/server';
 import * as jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
+import { getJwtKeys } from '@/lib/jwt';
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,14 +13,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No refresh token provided' }, { status: 401 });
     }
 
-    // Load keys conditionally
-    const privateKey = process.env.NODE_ENV === 'production'
-      ? process.env.JWT_PRIVATE_KEY!
-      : fs.readFileSync(path.join(process.cwd(), 'private_key.pem'), 'utf8');
-
-    const publicKey = process.env.NODE_ENV === 'production'
-      ? process.env.JWT_PUBLIC_KEY!
-      : fs.readFileSync(path.join(process.cwd(), 'public_key.pem'), 'utf8');
+    const { privateKey, publicKey } = getJwtKeys();
 
     let decoded;
     try {

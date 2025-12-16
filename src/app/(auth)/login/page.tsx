@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form'; // 1. Import from React Hook Form
 import { zodResolver } from '@hookform/resolvers/zod'; // 2. Import the Zod resolver
 import * as z from 'zod'; // 3. Import Zod
+import { useAuthStore } from '@/lib/store/auth';
 
 // 4. Define the form schema and validation rules with Zod
 const loginSchema = z.object({
@@ -22,6 +23,7 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const router = useRouter();
+  const { login } = useAuthStore();
 
   // 6. Set up the useForm hook
   const {
@@ -43,6 +45,7 @@ export default function LoginPage() {
       });
 
       if (res.ok) {
+        login();
         router.push('/profile');
       } else {
         const responseData = await res.json();

@@ -1,9 +1,9 @@
 // app/api/auth/register/route.ts
 
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/../lib/db';
+import { prisma } from '@/lib/db';
 import * as argon2 from 'argon2';
-import { createAndSetSession } from '@/lib/session'; // 1. Import our new utility
+import { createAndSetSession } from '@/lib/jwt'; // 1. Import our new utility
 
 export async function POST(request: NextRequest) {
   try {

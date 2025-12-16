@@ -1,6 +1,6 @@
 // prisma/seed.ts
 
-import { prisma } from '@/../lib/db';
+import { prisma } from '@/lib/db';
 import { StockStatus } from '@/generated/prisma/enums';
 
 async function main() {
@@ -71,6 +71,26 @@ async function main() {
     console.log(`Created product with id: ${product.id}`);
   }
 
+  console.log('Seeding finished for products.');
+
+  console.log('Upserting test user...');
+  const user = await prisma.user.upsert({
+    where: { email: 'bbaron.daniel@gmail.com' },
+    update: {},
+    create: {
+      id: '8e7bec97-aa44-42ab-8ce1-f6cedb9bddd1',
+      email: 'bbaron.daniel@gmail.com',
+      fullName: 'Daniel Baron',
+      password: '$argon2id$v=19$m=65536,t=3,p=4$mr2LyUzQoaeaXy41n3Sb/A$/r3M579MT+7//7eM9KdT2lfNu6QHpXJTPMElvsKUvxE',
+      country: 'Canada',
+      phoneNumber: '4374355140',
+      role: 'USER',
+      createdAt: '2025-12-16T00:24:40.326Z',
+      updatedAt: '2025-12-16T00:24:40.326Z',
+    },
+  });
+  console.log(`Upserted user with id: ${user.id}`);
+  
   console.log('Seeding finished.');
 }
 
