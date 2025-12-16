@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Product } from '@/generated/prisma/client';
+import MarketplaceLoading from '@/app/marketplace/loading';
 
 export default function MarketplacePage() {
   // --- STATE MANAGEMENT ---
@@ -57,7 +58,6 @@ export default function MarketplacePage() {
       products = products.filter((p) => query.categories.includes(p.category));
     }
     products.sort((a, b) => {
-
       const priceA = a.price as unknown as number;
       const priceB = b.price as unknown as number;
       if (query.sortBy === 'price-desc') return priceB - priceA;
@@ -80,6 +80,10 @@ export default function MarketplacePage() {
     setQuery({ categories: [] });
     setIsSheetOpen(false);
   };
+
+  if (loading) {
+    return <MarketplaceLoading />;
+  }
 
   if (error) {
     return <div className="p-12 text-center text-red-500">Error: {error}</div>;
@@ -161,9 +165,7 @@ export default function MarketplacePage() {
 const NoResultsFound = ({ onClear }: { onClear: () => void }) => (
   <div className="col-span-full mt-12 flex flex-col items-center justify-center text-center">
     <h2 className="font-serif text-2xl font-medium">No Assets Found</h2>
-    <p className="mt-2 text-muted-foreground">
-      Try adjusting your filters or view all products.
-    </p>
+    <p className="mt-2 text-muted-foreground">Try adjusting your filters or view all products.</p>
     <Button onClick={onClear} className="mt-6">
       Clear Filters
     </Button>

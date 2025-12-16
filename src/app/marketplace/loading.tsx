@@ -1,7 +1,7 @@
 import { Skeleton } from '@/components/ui/skeleton';
 import { ProductCardSkeleton } from '@/components/ProductCardSkeleton';
 
-export default function Loading() {
+export default function MarketplaceLoading() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <main className="container mx-auto animate-pulse px-4 py-12">
