@@ -13,7 +13,15 @@ export async function GET() {
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      include: {
+      select: { // Explicitly select fields to exclude password
+        id: true,
+        email: true,
+        fullName: true,
+        country: true,
+        phoneNumber: true,
+        role: true,
+        createdAt: true,
+        updatedAt: true,
         orders: {
           include: {
             items: {

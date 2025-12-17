@@ -10,7 +10,7 @@ import { useAuthStore } from '@/lib/store/auth';
 import { useRouter } from 'next/navigation';
 
 export const Navbar = () => {
-  const { isLoggedIn, logout, isLoading } = useAuthStore();
+  const { isLoggedIn, logout, isLoading, user } = useAuthStore(); // Destructure user
   const router = useRouter();
 
   const handleLogout = async () => {
@@ -72,11 +72,17 @@ export const Navbar = () => {
                         My Account
                       </Button>
                     </Link>
-                    <Button
-                      onClick={handleLogout}
-                      variant="dark"
-                      className="rounded-md"
-                    >
+                    {user?.role === 'ADMIN' && ( // Conditional render for admin
+                      <Link href="/admin">
+                        <Button
+                          variant="outline"
+                          className="rounded-md border-gray-900 bg-transparent text-[#1a202c] hover:bg-gray-900 hover:text-white"
+                        >
+                          Admin Panel
+                        </Button>
+                      </Link>
+                    )}
+                    <Button onClick={handleLogout} variant="dark" className="rounded-md">
                       Logout
                     </Button>
                   </>
@@ -116,6 +122,13 @@ export const Navbar = () => {
                               My Account
                             </Link>
                           </SheetClose>
+                          {user?.role === 'ADMIN' && ( // Conditional render for admin
+                            <SheetClose asChild>
+                              <Link href="/admin" className="text-lg font-medium text-[#1a202c]">
+                                Admin Panel
+                              </Link>
+                            </SheetClose>
+                          )}
                         </>
                       ) : (
                         <SheetClose asChild>
@@ -138,7 +151,7 @@ export const Navbar = () => {
                         <SheetClose asChild>
                           <button
                             onClick={handleLogout}
-                            className="text-lg text-left font-medium text-red-600"
+                            className="text-left text-lg font-medium text-red-600"
                           >
                             Logout
                           </button>

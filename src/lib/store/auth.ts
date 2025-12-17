@@ -1,49 +1,52 @@
 import { create } from 'zustand';
+import { User } from '@/generated/prisma/client'; // Import User type
 
 interface AuthState {
   isLoggedIn: boolean;
   isLoading: boolean;
+  user: Omit<User, 'password'> | null; // Save the whole user object (without password)
   checkAuth: () => Promise<void>;
-  login: () => void;
+  login: (user: Omit<User, 'password'>) => void; // Login now accepts the user object
   logout: () => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
   isLoggedIn: false,
   isLoading: true,
+  user: null, // Initialize user object
   checkAuth: async () => {
     set({ isLoading: true });
     try {
-      // 1. Try to get user data with the current accessToken
       const meResponse = await fetch('/api/users/me');
 
       if (meResponse.ok) {
-        // SUCCESS: Access token is valid.
-        set({ isLoggedIn: true });
+        const user = await meResponse.json();
+        set({ isLoggedIn: true, user: user });
         return;
       }
 
       if (meResponse.status === 401) {
-        // INFO: Access token is stale or invalid. Try to refresh.
         const refreshResponse = await fetch('/api/auth/refresh', { method: 'POST' });
 
         if (refreshResponse.ok) {
-          // SUCCESS: Refresh was successful. A new accessToken is now in the cookies.
-          set({ isLoggedIn: true });
-          return;
+          const userResponse = await fetch('/api/users/me');
+          if (userResponse.ok) {
+            const user = await userResponse.json();
+            set({ isLoggedIn: true, user: user });
+            return;
+          }
         }
       }
        
-      // FAILURE: All attempts failed. User is not logged in.
-      set({ isLoggedIn: false });
-
+      set({ isLoggedIn: false, user: null });
     } catch (error) {
       console.error('Auth check failed', error);
-      set({ isLoggedIn: false });
+      set({ isLoggedIn: false, user: null });
     } finally {
       set({ isLoading: false });
     }
   },
-  login: () => set({ isLoggedIn: true }),
-  logout: () => set({ isLoggedIn: false }),
+  login: (user: Omit<User, 'password'>) => set({ isLoggedIn: true, user: user }),
+  logout: () => set({ isLoggedIn: false, user: null }),
 }));
+
