@@ -122,3 +122,9 @@ model GoldPrice {
   previousPrice Decimal   @db.Decimal(10, 3)
   updatedAt     DateTime  @updatedAt
 }
+
+model Karat {
+  id     Int     @id @default(autoincrement())
+  name   String  @unique // e.g., "24K", "22K"
+  purity Decimal @db.Decimal(8, 4) // e.g., 0.9999
+}

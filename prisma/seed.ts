@@ -2,9 +2,32 @@
 
 import { prisma } from '@/lib/db';
 import { StockStatus, ProductCategory } from '@/generated/prisma/client';
+import { Decimal } from '@prisma/client-runtime-utils';
 
 async function main() {
   console.log('Start seeding...');
+  
+  console.log('Seeding Karat values...');
+  await prisma.karat.deleteMany({});
+  const karatData = [
+    { name: '24K', purity: new Decimal(0.999) },
+    { name: '22K', purity: new Decimal(0.9167) },
+    { name: '18K', purity: new Decimal(0.7500) },
+    { name: '14K', purity: new Decimal(0.5833) },
+    { name: '10K', purity: new Decimal(0.4167) },
+  ];
+
+  for (const k of karatData) {
+    await prisma.karat.upsert({
+      where: { name: k.name },
+      update: {},
+      create: {
+        name: k.name,
+        purity: k.purity,
+      },
+    });
+  }
+  console.log('Karat seeding finished.');
 
   await prisma.product.deleteMany({});
   console.log('Deleted existing products.');

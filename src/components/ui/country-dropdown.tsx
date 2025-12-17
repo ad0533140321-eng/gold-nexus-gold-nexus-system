@@ -38,7 +38,7 @@ export interface Country {
 interface CountryDropdownProps {
   options?: Country[];
   onChange?: (country: Country) => void;
-  value: Country;
+  value: Country | undefined;
   disabled?: boolean;
   placeholder?: string;
   slim?: boolean;
@@ -52,7 +52,7 @@ const CountryDropdownComponent = (
   {
     options = hardcodedOptions,
     onChange,
-    value = hardcodedOptions.find(x => x.alpha3 === "USA") || hardcodedOptions[0],
+    value,
     disabled = false,
     placeholder = 'Select a country',
     slim = false,
@@ -128,7 +128,7 @@ const CountryDropdownComponent = (
                     <CheckIcon
                       className={cn(
                         'ml-auto h-4 w-4 shrink-0',
-                        option.name === value.name ? 'opacity-100' : 'opacity-0'
+                        option.name === value?.name ? 'opacity-100' : 'opacity-0'
                       )}
                     />
                   </CommandItem>

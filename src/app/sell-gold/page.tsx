@@ -1,3 +1,9 @@
+'use client';
+
+import { useState, useEffect, useRef } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { leadSchema, LeadFormValues } from '@/lib/zod-schemas/leadSchema';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -9,11 +15,118 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Upload } from 'lucide-react';
-import { CountryDropdown } from '@/components/ui/country-dropdown';
-import { countries } from 'country-data-list'; // Icon for the uploader
+import { CheckCircle, AlertTriangle } from 'lucide-react';
+import { CountryDropdown, Country } from '@/components/ui/country-dropdown';
+import { countries } from 'country-data-list';
+import { FileUploader } from '@/components/ui/file-uploader';
+import { supabase } from '@/lib/supabase';
+import { v4 as uuidv4 } from 'uuid';
+import { Karat } from '@/generated/prisma/client';
 
 export default function SellGoldPage() {
+  const [submissionState, setSubmissionState] = useState<{
+    status: 'idle' | 'submitting' | 'success' | 'error';
+    message: string | null;
+  }>({ status: 'idle', message: null });
+  
+  const [karats, setKarats] = useState<Karat[]>([]);
+  const uploadFilesRef = useRef<File[]>([]);
+
+  useEffect(() => {
+    const fetchKarats = async () => {
+      try {
+        const res = await fetch('/api/karats');
+        if (!res.ok) throw new Error('Failed to fetch karats');
+        const data = await res.json();
+        setKarats(data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchKarats();
+  }, []);
+
+  const {
+    handleSubmit,
+    control,
+    formState: { errors },
+  } = useForm<LeadFormValues>({
+    resolver: zodResolver(leadSchema),
+    defaultValues: {
+      fullName: '',
+      email: '',
+      phoneNumber: '',
+      country: '',
+      city: '',
+      itemType: '',
+      estimatedKarat: '',
+      estimatedWeight: '',
+      photoUrls: [],
+    },
+  });
+
+  const onSubmit = async (data: LeadFormValues) => {
+    const files = uploadFilesRef.current;
+    
+    setSubmissionState({ status: 'submitting', message: 'Uploading images...' });
+
+    try {
+      const uploadPromises = files.map(file => {
+        const filePath = `lead-photos/${uuidv4()}-${file.name}`;
+        return supabase.storage.from('gold-nexus-leads').upload(filePath, file);
+      });
+
+      const uploadedFileResults = await Promise.all(uploadPromises);
+      
+      const photoUrls: string[] = [];
+      for (const result of uploadedFileResults) {
+        if (result.error) {
+          throw new Error(`Failed to upload image: ${result.error.message}`);
+        }
+        const { data: urlData } = supabase.storage.from('gold-nexus-leads').getPublicUrl(result.data.path);
+        photoUrls.push(urlData.publicUrl);
+      }
+      
+      setSubmissionState({ status: 'submitting', message: 'Submitting inquiry...' });
+
+      // The 'data' from onSubmit doesn't include the real URLs, so we build the final payload.
+      const submissionData = { 
+        ...data, 
+        photoUrls: photoUrls // Override with the real URLs
+      };
+
+      const response = await fetch('/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(submissionData),
+      });
+
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result.message || 'An unknown error occurred.');
+      }
+
+      setSubmissionState({
+        status: 'success',
+        message: 'Your inquiry has been submitted successfully! We will contact you shortly.',
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to submit inquiry.';
+      setSubmissionState({ status: 'error', message });
+    }
+  };
+
+  if (submissionState.status === 'success') {
+    return (
+      <div className="flex min-h-[60vh] flex-col items-center justify-center text-center">
+        <CheckCircle className="h-16 w-16 text-green-500" />
+        <h1 className="mt-4 font-serif text-3xl font-medium">Thank You!</h1>
+        <p className="mt-2 max-w-md text-neutral-600">{submissionState.message}</p>
+        <Button onClick={() => window.location.reload()} className="mt-6">Submit Another Inquiry</Button>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen w-full bg-[#F9F9F9] px-4 py-12 sm:px-6 lg:py-20">
       <main className="mx-auto max-w-2xl">
@@ -30,109 +143,129 @@ export default function SellGoldPage() {
             <CardTitle className="font-sans text-xl font-semibold">Inquiry Details</CardTitle>
           </CardHeader>
           <CardContent>
-            <form className="space-y-6">
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="full-name">Full Name</Label>
-                  <Input
-                    id="full-name"
-                    placeholder="John Smith"
-                    className="rounded-md border-neutral-300"
-                  />
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              <div className="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2">
+                <div>
+                  <Label htmlFor="fullName">Full Name</Label>
+                  <Controller name="fullName" control={control} render={({ field }) => <Input id="fullName" {...field} className="mt-1.5" />} />
+                  {errors.fullName && <p className="mt-1 text-xs text-red-500">{errors.fullName.message}</p>}
                 </div>
-                <div className="space-y-2">
+                <div>
                   <Label htmlFor="email">Email Address</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="name@example.com"
-                    className="rounded-md border-neutral-300"
-                  />
+                  <Controller name="email" control={control} render={({ field }) => <Input id="email" type="email" {...field} className="mt-1.5" />} />
+                  {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email.message}</p>}
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="phone-number">Phone Number</Label>
-                  <Input
-                    id="phone-number"
-                    placeholder="(555) 000-0000"
-                    className="rounded-md border-neutral-300"
-                  />
+                <div>
+                  <Label htmlFor="phoneNumber">Phone Number</Label>
+                  <Controller name="phoneNumber" control={control} render={({ field }) => <Input id="phoneNumber" {...field} className="mt-1.5" />} />
+                  {errors.phoneNumber && <p className="mt-1 text-xs text-red-500">{errors.phoneNumber.message}</p>}
                 </div>
-                <div className="space-y-2">
+                <div>
                   <Label htmlFor="country">Country</Label>
-                  <CountryDropdown value={countries.all[0]}/>
+                  <Controller
+                    name="country"
+                    control={control}
+                    render={({ field }) => (
+                      <div className="mt-1.5">
+                        <CountryDropdown
+                          value={countries.all.find(c => c.name === field.value)}
+                          onChange={(country: Country) => field.onChange(country.name)}
+                        />
+                      </div>
+                    )}
+                  />
+                  {errors.country && <p className="mt-1 text-xs text-red-500">{errors.country.message}</p>}
                 </div>
               </div>
 
-              <div className="space-y-2">
+              <div>
                 <Label htmlFor="city">City</Label>
-                <Input id="city" placeholder="New York" className="rounded-md border-neutral-300" />
+                <Controller name="city" control={control} render={({ field }) => <Input id="city" {...field} className="mt-1.5" />} />
+                {errors.city && <p className="mt-1 text-xs text-red-500">{errors.city.message}</p>}
               </div>
 
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="item-type">Item Type</Label>
-                  <Select>
-                    <SelectTrigger className="w-full rounded-md border-neutral-300 text-neutral-500">
-                      <SelectValue placeholder="Select item type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="bar">Gold Bar</SelectItem>
-                      <SelectItem value="coin">Gold Coin</SelectItem>
-                      <SelectItem value="jewelry">Jewelry</SelectItem>
-                    </SelectContent>
-                  </Select>
+                <div>
+                  <Label htmlFor="itemType">Item Type</Label>
+                  <Controller
+                    name="itemType"
+                    control={control}
+                    render={({ field }) => (
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <SelectTrigger className="mt-1.5"><SelectValue placeholder="Select item type" /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Gold Bar">Gold Bar</SelectItem>
+                          <SelectItem value="Gold Coin">Gold Coin</SelectItem>
+                          <SelectItem value="Jewelry">Jewelry</SelectItem>
+                          <SelectItem value="Other">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                  {errors.itemType && <p className="mt-1 text-xs text-red-500">{errors.itemType.message}</p>}
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="karat">Estimated Karat</Label>
-                  <Select>
-                    <SelectTrigger className="w-full rounded-md border-neutral-300 text-neutral-500">
-                      <SelectValue placeholder="Select karat" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="24">24K (99.9%)</SelectItem>
-                      <SelectItem value="22">22K (91.7%)</SelectItem>
-                      <SelectItem value="18">18K (75.0%)</SelectItem>
-                      <SelectItem value="14">14K (58.3%)</SelectItem>
-                    </SelectContent>
-                  </Select>
+                <div>
+                  <Label htmlFor="estimatedKarat">Estimated Karat</Label>
+                   <Controller
+                    name="estimatedKarat"
+                    control={control}
+                    render={({ field }) => (
+                      <Select onValueChange={field.onChange} value={field.value} disabled={karats.length === 0}>
+                        <SelectTrigger className="mt-1.5"><SelectValue placeholder={karats.length > 0 ? "Select karat" : "Loading..."} /></SelectTrigger>
+                        <SelectContent>
+                          {karats.map(k => (
+                            <SelectItem key={k.id} value={k.name}>{k.name}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                  {errors.estimatedKarat && <p className="mt-1 text-xs text-red-500">{errors.estimatedKarat.message}</p>}
                 </div>
               </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="weight">Estimated Weight</Label>
-                <Input
-                  id="weight"
-                  placeholder="e.g., 100 grams or 3.2 oz"
-                  className="rounded-md border-neutral-300"
-                />
+              
+              <div>
+                <Label htmlFor="estimatedWeight">Estimated Weight (in grams)</Label>
+                <Controller name="estimatedWeight" control={control} render={({ field }) => <Input id="estimatedWeight" placeholder="e.g., 100" {...field} className="mt-1.5" />} />
+                {errors.estimatedWeight && <p className="mt-1 text-xs text-red-500">{errors.estimatedWeight.message}</p>}
               </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="photo-upload">Photo Upload</Label>
-                <div className="flex w-full items-center justify-center">
-                  <label
-                    htmlFor="dropzone-file"
-                    className="flex h-32 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-neutral-300 bg-neutral-50 hover:bg-neutral-100"
-                  >
-                    <div className="flex flex-col items-center justify-center pb-6 pt-5">
-                      <Upload className="mb-3 h-8 w-8 text-neutral-400" />
-                      <p className="mb-2 text-sm text-neutral-500">
-                        <span className="font-semibold">Click to upload</span> or drag and drop
-                        images
-                      </p>
-                      <p className="text-xs text-neutral-500">PNG, JPG up to 10MB</p>
+              
+              <div>
+                <Label>Photo Upload</Label>
+                <Controller
+                  name="photoUrls"
+                  control={control}
+                  render={({ field }) => (
+                    <div className="mt-1.5">
+                      <FileUploader
+                        onFilesChange={(files) => {
+                          // Update the ref for the actual upload process
+                          uploadFilesRef.current = files;
+                          // Update the form field with dummy data (file names) for validation
+                          field.onChange(files.map(file => file.name));
+                        }}
+                        maxFiles={10}
+                      />
                     </div>
-                    <input id="dropzone-file" type="file" className="hidden" multiple />
-                  </label>
-                </div>
+                  )}
+                />
+                {errors.photoUrls && <p className="mt-1 text-xs text-red-500">{errors.photoUrls.message}</p>}
               </div>
+
+              {submissionState.status === 'error' && (
+                <div className="flex items-center gap-2 rounded-md bg-red-50 p-3 text-red-700">
+                  <AlertTriangle className="h-5 w-5" />
+                  <p className="text-sm font-medium">{submissionState.message}</p>
+                </div>
+              )}
 
               <div className="pt-2">
                 <Button
                   type="submit"
+                  disabled={submissionState.status === 'submitting'}
                   className="w-full rounded-md bg-black py-6 text-base font-semibold text-white hover:bg-neutral-800"
                 >
-                  Submit Inquiry
+                  {submissionState.status === 'submitting' ? submissionState.message : 'Submit Inquiry'}
                 </Button>
               </div>
             </form>
