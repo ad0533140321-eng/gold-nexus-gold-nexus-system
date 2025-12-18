@@ -2,7 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { formatStatus } from "@/lib/utils";
 
 interface StatusBadgeProps {
-  status: string; // Changed to generic string
+  status: string;
 }
 
 export const StatusBadge = ({ status }: StatusBadgeProps) => {

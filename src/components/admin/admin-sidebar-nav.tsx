@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Package2, Users, ShoppingCart, Gem } from 'lucide-react';
-import { cn } from '@/lib/utils'; // Assuming cn utility exists
+import { cn } from '@/lib/utils';
 
 export function AdminSidebarNav() {
   const pathname = usePathname();
