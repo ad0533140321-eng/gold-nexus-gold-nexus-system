@@ -5,7 +5,12 @@ import { prisma } from '@/lib/db';
  * This function centralizes the data access logic so it can be reused
  * by both Server Components and API Routes.
  */
-export async function getLeads(page: number, limit: number) {
+export async function getLeads(
+  page: number, 
+  limit: number, 
+  sortBy: string = 'createdAt', 
+  sortOrder: 'asc' | 'desc' = 'desc'
+) {
   const skip = (page - 1) * limit;
 
   const [leads, total] = await prisma.$transaction([
@@ -13,7 +18,7 @@ export async function getLeads(page: number, limit: number) {
       skip,
       take: limit,
       orderBy: {
-        createdAt: 'desc',
+        [sortBy]: sortOrder,
       },
     }),
     prisma.secondHandLead.count(),
@@ -21,13 +26,17 @@ export async function getLeads(page: number, limit: number) {
 
   const totalPages = Math.ceil(total / limit);
 
-  // Safely parse photoUrls for each lead
+  // Safely parse photoUrls for each lead and serialize Decimal
   const leadsWithParsedPhotos = leads.map(lead => {
     const photoUrls: string[] =
       lead.photoUrls && Array.isArray(lead.photoUrls)
         ? lead.photoUrls.filter((item): item is string => typeof item === 'string')
         : [];
-    return { ...lead, photoUrls };
+    return { 
+      ...lead, 
+      photoUrls,
+      estimatedValue: lead.estimatedValue ? lead.estimatedValue.toString() : null
+    };
   });
 
   return {
@@ -59,5 +68,9 @@ export async function getLeadById(id: string) {
       ? lead.photoUrls.filter((item): item is string => typeof item === 'string')
       : [];
 
-  return { ...lead, photoUrls };
+  return { 
+    ...lead, 
+    photoUrls,
+    estimatedValue: lead.estimatedValue ? lead.estimatedValue.toString() : null 
+  };
 }

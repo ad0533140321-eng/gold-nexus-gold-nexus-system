@@ -6,16 +6,34 @@ import { prisma } from '@/lib/db';
  * @param limit The number of items per page.
  * @returns An object containing paginated order data.
  */
-export async function getOrders(page: number, limit: number) {
+export async function getOrders(
+  page: number, 
+  limit: number,
+  sortBy: string = 'createdAt',
+  sortOrder: 'asc' | 'desc' = 'desc'
+) {
   const skip = (page - 1) * limit;
+
+  // Define allowed sort keys to prevent 'any' usage
+  const allowedSortKeys = ['totalAmount', 'displayId', 'status', 'createdAt'] as const;
+  type AllowedSortKey = typeof allowedSortKeys[number];
+
+  let orderBy: Record<string, any> = {};
+
+  if (sortBy === 'customer') {
+    orderBy = { user: { fullName: sortOrder } };
+  } else if (allowedSortKeys.includes(sortBy as AllowedSortKey)) {
+    orderBy = { [sortBy]: sortOrder };
+  } else {
+    // Fallback default
+    orderBy = { createdAt: 'desc' };
+  }
 
   const [orders, total] = await prisma.$transaction([
     prisma.order.findMany({
       skip,
       take: limit,
-      orderBy: {
-        createdAt: 'desc',
-      },
+      orderBy,
       include: {
         user: {
           select: {
