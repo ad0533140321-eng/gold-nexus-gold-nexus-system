@@ -89,7 +89,7 @@ export async function POST(req: NextRequest) {
         data: {
           userId,
           totalAmount,
-          shippingAddressJson: { ...shippingAddress, country: shippingAddress.country.name },
+          shippingAddressJson: { ...shippingAddress, country: shippingAddress.country?.name ?? '' },
           status: 'PENDING',
           items: {
             create: orderItemsCreateData,
@@ -115,7 +115,7 @@ export async function POST(req: NextRequest) {
     );
 
     return NextResponse.json(
-      { orderId: newOrder.id, checkoutUrl: stripeSession.url },
+      { orderId: newOrder.id, displayId: newOrder.displayId, checkoutUrl: stripeSession.url },
       { status: 201 }
     );
   } catch (error) {

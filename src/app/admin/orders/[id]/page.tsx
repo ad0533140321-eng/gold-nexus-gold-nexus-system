@@ -27,14 +27,9 @@ import {
 } from '@/components/ui/select';
 import { ConfirmActionModal } from '@/components/admin/confirm-action-modal';
 import OrderDetailLoading from '@/app/admin/orders/[id]/loading';
+import { toast } from 'sonner';
 
-const ORDER_STATUSES = [
-  'PENDING',
-  'PROCESSING',
-  'SHIPPED',
-  'COMPLETED',
-  'FAILED',
-] as const;
+const ORDER_STATUSES = ['PENDING', 'PROCESSING', 'SHIPPED', 'COMPLETED', 'FAILED'] as const;
 
 type OrderDetail = {
   id: string;
@@ -61,7 +56,6 @@ type OrderDetail = {
   }[];
 };
 
-
 interface OrderDetailPageProps {
   params: Promise<{
     id: string;
@@ -76,7 +70,7 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
   const [selectedNewStatus, setSelectedNewStatus] = useState<string | null>(null);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
-  
+
   const [selectValue, setSelectValue] = useState<string | undefined>();
 
   useEffect(() => {
@@ -84,7 +78,7 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
       try {
         const { id } = await params;
         const res = await fetch(`/api/admin/orders/${id}`);
-        
+
         if (!res.ok) {
           if (res.status === 404) {
             notFound();
@@ -98,20 +92,20 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
         setOrder(fetchedOrder);
       } catch (err) {
         setError('Failed to load order details.');
-        console.error('Error fetching order details:', err);
+        toast.error('Failed to load order details');
       } finally {
         setIsLoading(false);
       }
     }
     fetchData();
   }, [params]);
-  
+
   useEffect(() => {
     setSelectValue(order?.status);
   }, [order]);
 
   if (isLoading) {
-    return <OrderDetailLoading/>;
+    return <OrderDetailLoading />;
   }
 
   if (error) {
@@ -150,16 +144,21 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
         const body = await res.json();
         throw new Error(body.message || 'Failed to update status');
       }
-      
+
       const updatedOrder = await res.json();
       setOrder(updatedOrder);
+      toast.success(`Order status updated to ${selectedNewStatus}`);
 
-      console.log(`[STUB] Order status changed to ${selectedNewStatus}. Triggering email to customer.`);
-      
+      console.log(
+        `[STUB] Order status changed to ${selectedNewStatus}. Triggering email to customer.`
+      );
+
       setIsConfirmModalOpen(false);
       setSelectedNewStatus(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An unknown error occurred');
+      const msg = err instanceof Error ? err.message : 'An unknown error occurred';
+      setError(msg);
+      toast.error(msg);
     } finally {
       setIsUpdatingStatus(false);
     }
@@ -170,7 +169,6 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
     setSelectedNewStatus(null);
     setSelectValue(order?.status);
   };
-
 
   return (
     <div className="space-y-6">
@@ -215,9 +213,7 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
                 </div>
                 <div className="space-y-2">
                   <p className="font-medium text-muted-foreground">Total Amount</p>
-                  <p className="text-base font-semibold">
-                    {formatCurrency(order.totalAmount)}
-                  </p>
+                  <p className="text-base font-semibold">{formatCurrency(order.totalAmount)}</p>
                 </div>
                 <div className="space-y-2">
                   <p className="font-medium text-muted-foreground">Payment ID</p>
@@ -234,76 +230,76 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
               </div>
             </CardContent>
           </Card>
-           <Card>
+          <Card>
             <CardHeader>
-                <CardTitle>Customer & Shipping</CardTitle>
+              <CardTitle>Customer & Shipping</CardTitle>
             </CardHeader>
             <CardContent>
-                <div className="grid grid-cols-1 gap-6 text-sm sm:grid-cols-2">
-                    <div className="space-y-2">
-                        <p className="font-medium text-muted-foreground">Name</p>
-                        <p>{order.user.fullName}</p>
-                    </div>
-                    <div className="space-y-2">
-                        <p className="font-medium text-muted-foreground">Email</p>
-                        <p>{order.user.email}</p>
-                    </div>
-                    <div className="space-y-2">
-                        <p className="font-medium text-muted-foreground">Shipping Name</p>
-                        <p>{shippingAddress.fullName || '-'}</p>
-                    </div>
-                     <div className="space-y-2">
-                        <p className="font-medium text-muted-foreground">Shipping Address</p>
-                        <p>{`${shippingAddress.address || ''}${shippingAddress.apartment ? `, ${shippingAddress.apartment}` : ''}`}</p>
-                        <p>{`${shippingAddress.city || ''}, ${shippingAddress.state || ''} ${shippingAddress.postalCode || ''}`}</p>
-                        <p>{shippingAddress.country || ''}</p>
-                    </div>
+              <div className="grid grid-cols-1 gap-6 text-sm sm:grid-cols-2">
+                <div className="space-y-2">
+                  <p className="font-medium text-muted-foreground">Name</p>
+                  <p>{order.user.fullName}</p>
                 </div>
+                <div className="space-y-2">
+                  <p className="font-medium text-muted-foreground">Email</p>
+                  <p>{order.user.email}</p>
+                </div>
+                <div className="space-y-2">
+                  <p className="font-medium text-muted-foreground">Shipping Name</p>
+                  <p>{shippingAddress.fullName || '-'}</p>
+                </div>
+                <div className="space-y-2">
+                  <p className="font-medium text-muted-foreground">Shipping Address</p>
+                  <p>{`${shippingAddress.address || ''}${shippingAddress.apartment ? `, ${shippingAddress.apartment}` : ''}`}</p>
+                  <p>{`${shippingAddress.city || ''}, ${shippingAddress.state || ''} ${shippingAddress.postalCode || ''}`}</p>
+                  <p>{shippingAddress.country || ''}</p>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
 
         <div className="space-y-6">
-             <Card>
-                <CardHeader>
-                    <CardTitle>Order Items</CardTitle>
-                </CardHeader>
-                <CardContent className="text-sm">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Image</TableHead>
-                          <TableHead>Product</TableHead>
-                          <TableHead className="text-right">Qty</TableHead>
-                          <TableHead className="text-right">Price</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {order.items.map((item) => (
-                          <TableRow key={item.id}>
-                            <TableCell>
-                              <Image
-                                src={item.product.imageUrl}
-                                alt={item.product.name}
-                                width={64}
-                                height={64}
-                                className="rounded-md"
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <div className="font-medium">{item.product.name}</div>
-                              <div className="text-muted-foreground">{item.product.sku}</div>
-                            </TableCell>
-                            <TableCell className="text-right">{item.quantity}</TableCell>
-                            <TableCell className="text-right">
-                              {formatCurrency(item.priceAtPurchase)}
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                </CardContent>
-             </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Order Items</CardTitle>
+            </CardHeader>
+            <CardContent className="text-sm">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Image</TableHead>
+                    <TableHead>Product</TableHead>
+                    <TableHead className="text-right">Qty</TableHead>
+                    <TableHead className="text-right">Price</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {order.items.map((item) => (
+                    <TableRow key={item.id}>
+                      <TableCell>
+                        <Image
+                          src={item.product.imageUrl}
+                          alt={item.product.name}
+                          width={64}
+                          height={64}
+                          className="rounded-md"
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <div className="font-medium">{item.product.name}</div>
+                        <div className="text-muted-foreground">{item.product.sku}</div>
+                      </TableCell>
+                      <TableCell className="text-right">{item.quantity}</TableCell>
+                      <TableCell className="text-right">
+                        {formatCurrency(item.priceAtPurchase)}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
         </div>
       </div>
 
@@ -315,7 +311,10 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
         message={
           <>
             Are you sure you want to change the order status to{' '}
-            <span className="font-bold">{selectedNewStatus ? formatStatus(selectedNewStatus) : 'N/A'}</span>?
+            <span className="font-bold">
+              {selectedNewStatus ? formatStatus(selectedNewStatus) : 'N/A'}
+            </span>
+            ?
             <br />
             This action will trigger an email notification to the customer.
           </>
@@ -326,5 +325,3 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
     </div>
   );
 }
-
-

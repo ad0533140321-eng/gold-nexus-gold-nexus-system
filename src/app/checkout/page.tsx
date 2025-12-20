@@ -17,11 +17,13 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Skeleton } from '@/components/ui/skeleton';
 import { shippingSchema, ShippingFormValues } from '@/lib/zod-schemas/shippingSchema';
+import { toast } from 'sonner';
 
 import { useAuthStore } from '@/lib/store/auth';
 
 export default function CheckoutPage() {
   const [isHydrated, setIsHydrated] = useState(false);
+  const [orderPlaced, setOrderPlaced] = useState(false);
   const { items } = useCartStore();
   const { isLoggedIn, isLoading: isAuthLoading } = useAuthStore();
 
@@ -30,7 +32,8 @@ export default function CheckoutPage() {
   }, []);
 
   // Show skeleton while checking auth status OR rehydrating the cart
-  if (isAuthLoading || !isHydrated) {
+  // Also show skeleton (or spinner) if order was just placed to prevent "Empty Cart" flash during redirect
+  if (isAuthLoading || !isHydrated || orderPlaced) {
     return <CheckoutSkeleton />;
   }
 
@@ -45,18 +48,19 @@ export default function CheckoutPage() {
   }
 
   // If all checks pass, render the actual checkout form
-  return <CheckoutForm />;
+  return <CheckoutForm onOrderPlaced={() => setOrderPlaced(true)} />;
 }
 
 // --- SUB-COMPONENTS ---
 
-const CheckoutForm = () => {
+const CheckoutForm = ({ onOrderPlaced }: { onOrderPlaced: () => void }) => {
   const { items } = useCartStore();
+  const [isProcessing, setIsProcessing] = useState(false);
   const {
     register,
     handleSubmit,
     control,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<ShippingFormValues>({
     resolver: zodResolver(shippingSchema),
     // You can set default values here if needed
@@ -69,16 +73,17 @@ const CheckoutForm = () => {
   const router = useRouter();
 
   const onConfirmAndPay = async (data: ShippingFormValues) => {
+    setIsProcessing(true);
     try {
       // Normalize the data on the frontend before sending
       const payload = {
         shippingAddress: {
           ...data,
         },
-        cartItems: items.map(item => ({ id: item.id, quantity: item.quantity })),
+        cartItems: items.map((item) => ({ id: item.id, quantity: item.quantity })),
       };
 
-      const response = await fetch('/api/orders/create', {
+      const res = await fetch('/api/orders/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -86,24 +91,23 @@ const CheckoutForm = () => {
         body: JSON.stringify(payload),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to create order');
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.message || 'Payment processing failed');
       }
 
-      const { checkoutUrl } = await response.json();
-      
-      // Clear the cart *after* successfully creating the order
+      const { orderId } = await res.json();
+
+      // Prevent "Empty Cart" flash by setting this state first
+      onOrderPlaced();
+
       clearCart();
-
-      // Redirect to Stripe (or our mock success page)
-      router.push(checkoutUrl);
-
-    } catch (error) {
-      console.error('Failed to process payment:', error);
-      // TODO: Replace with a more user-friendly notification (e.g., a Toast)
-      // @ts-expect-error an error bro.
-      alert(`Error: ${error.message}`);
+      router.push(`/order-confirmation/${orderId}`);
+      toast.success('Order placed successfully!');
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to process payment. Please try again.');
+    } finally {
+      setIsProcessing(false);
     }
   };
   return (
@@ -175,7 +179,7 @@ const CheckoutForm = () => {
                       render={({ field }) => (
                         <CountryDropdown
                           onChange={(country: Country) => field.onChange(country)}
-                          value={field.value}
+                          value={field.value || undefined}
                         />
                       )}
                     />
@@ -260,10 +264,10 @@ const CheckoutForm = () => {
                 type="submit"
                 size="lg"
                 className="w-full rounded-md bg-black font-semibold text-white hover:bg-neutral-800"
-                disabled={isSubmitting}
+                disabled={isProcessing}
               >
                 <Lock className="mr-2 h-4 w-4" />
-                {isSubmitting ? 'Processing...' : 'Confirm and Pay'}
+                {isProcessing ? 'Processing...' : 'Confirm and Pay'}
               </Button>
             </CardContent>
           </Card>
@@ -301,76 +305,78 @@ const PleaseLogin = () => {
 };
 
 const EmptyCart = () => (
-    <div className="flex min-h-[60vh] flex-col items-center justify-center gap-6 text-center">
-      <ShoppingCart className="h-20 w-20 text-gray-300" />
-      <div>
-        <h2 className="font-serif text-3xl font-medium">Your Cart is Empty</h2>
-        <p className="mt-2 text-muted-foreground">You can&#39;t proceed to checkout without any items.</p>
-      </div>
-      <Link href="/marketplace">
-        <Button className="rounded-md bg-black font-semibold text-white hover:bg-neutral-800">
-          Return to Marketplace
-        </Button>
-      </Link>
+  <div className="flex min-h-[60vh] flex-col items-center justify-center gap-6 text-center">
+    <ShoppingCart className="h-20 w-20 text-gray-300" />
+    <div>
+      <h2 className="font-serif text-3xl font-medium">Your Cart is Empty</h2>
+      <p className="mt-2 text-muted-foreground">
+        You can&#39;t proceed to checkout without any items.
+      </p>
     </div>
-  );
-  
-  const CheckoutSkeleton = () => (
-    <div className="min-h-screen w-full animate-pulse bg-[#F9F9F9] px-4 py-12 sm:px-6 lg:px-8">
-      <main className="mx-auto max-w-6xl">
-        <Skeleton className="mb-8 h-12 w-1/3" />
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:items-start">
-          <Card className="border-neutral-200 bg-white shadow-none">
-            <CardHeader>
-              <Skeleton className="h-8 w-1/2" />
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-1/4" />
-                <Skeleton className="h-10 w-full" />
-              </div>
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-1/4" />
-                <Skeleton className="h-10 w-full" />
-              </div>
-              <div className="grid grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Skeleton className="h-4 w-1/3" />
-                  <Skeleton className="h-10 w-full" />
-                </div>
-                <div className="space-y-2">
-                  <Skeleton className="h-4 w-1/3" />
-                  <Skeleton className="h-10 w-full" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="border-neutral-200 bg-white shadow-none">
-            <CardHeader>
-              <Skeleton className="h-8 w-1/2" />
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="flex items-center gap-4">
-                <Skeleton className="h-16 w-16 rounded-md" />
-                <div className="space-y-2">
-                  <Skeleton className="h-4 w-48" />
-                  <Skeleton className="h-3 w-16" />
-                </div>
-              </div>
-              <div className="flex items-center gap-4">
-                <Skeleton className="h-16 w-16 rounded-md" />
-                <div className="space-y-2">
-                  <Skeleton className="h-4 w-48" />
-                  <Skeleton className="h-3 w-16" />
-                </div>
-              </div>
-              <Separator />
+    <Link href="/marketplace">
+      <Button className="rounded-md bg-black font-semibold text-white hover:bg-neutral-800">
+        Return to Marketplace
+      </Button>
+    </Link>
+  </div>
+);
+
+const CheckoutSkeleton = () => (
+  <div className="min-h-screen w-full animate-pulse bg-[#F9F9F9] px-4 py-12 sm:px-6 lg:px-8">
+    <main className="mx-auto max-w-6xl">
+      <Skeleton className="mb-8 h-12 w-1/3" />
+      <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:items-start">
+        <Card className="border-neutral-200 bg-white shadow-none">
+          <CardHeader>
+            <Skeleton className="h-8 w-1/2" />
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-1/4" />
               <Skeleton className="h-10 w-full" />
-              <Separator />
-              <Skeleton className="h-12 w-full" />
-            </CardContent>
-          </Card>
-        </div>
-      </main>
-    </div>
-  );
+            </div>
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-1/4" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <div className="grid grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-1/3" />
+                <Skeleton className="h-10 w-full" />
+              </div>
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-1/3" />
+                <Skeleton className="h-10 w-full" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="border-neutral-200 bg-white shadow-none">
+          <CardHeader>
+            <Skeleton className="h-8 w-1/2" />
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="flex items-center gap-4">
+              <Skeleton className="h-16 w-16 rounded-md" />
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-48" />
+                <Skeleton className="h-3 w-16" />
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <Skeleton className="h-16 w-16 rounded-md" />
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-48" />
+                <Skeleton className="h-3 w-16" />
+              </div>
+            </div>
+            <Separator />
+            <Skeleton className="h-10 w-full" />
+            <Separator />
+            <Skeleton className="h-12 w-full" />
+          </CardContent>
+        </Card>
+      </div>
+    </main>
+  </div>
+);
