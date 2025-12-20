@@ -5,12 +5,10 @@ import { ArrowLeft } from "lucide-react"
 
 export function DetailSkeleton() {
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
+    <div className="w-full space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-            <Button variant="outline" size="icon" disabled>
-                <ArrowLeft className="h-4 w-4" />
-            </Button>
+            <Skeleton className="h-9 w-9 rounded-md" />
             <Skeleton className="h-8 w-[200px]" />
         </div>
         <div className="flex gap-2">
