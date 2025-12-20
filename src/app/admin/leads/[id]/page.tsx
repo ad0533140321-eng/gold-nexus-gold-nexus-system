@@ -16,6 +16,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
+import LeadDetailLoading from '@/app/admin/leads/[id]/loading';
 
 const LEAD_STATUSES = ['SUBMITTED', 'CONTACTED', 'CLOSED'] as const;
 
@@ -72,7 +73,7 @@ export default function LeadDetailPage({ params }: LeadDetailPageProps) {
     }
     fetchData();
   }, [params]);
-  
+
   useEffect(() => {
     setSelectValue(lead?.status);
   }, [lead]);
@@ -105,9 +106,9 @@ export default function LeadDetailPage({ params }: LeadDetailPageProps) {
       setIsUpdatingStatus(false);
     }
   };
-  
+
   if (isLoading) {
-    return <div className="p-4 text-center">Loading lead details...</div>;
+    return <LeadDetailLoading />;
   }
 
   if (error) {
@@ -164,7 +165,7 @@ export default function LeadDetailPage({ params }: LeadDetailPageProps) {
                   >
                     <SelectTrigger className="w-[180px]">
                       <SelectValue asChild>
-                         {selectValue ? <StatusBadge status={selectValue} /> : null}
+                        {selectValue ? <StatusBadge status={selectValue} /> : null}
                       </SelectValue>
                     </SelectTrigger>
                     <SelectContent>

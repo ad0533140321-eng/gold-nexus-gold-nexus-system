@@ -26,6 +26,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { ConfirmActionModal } from '@/components/admin/confirm-action-modal';
+import OrderDetailLoading from '@/app/admin/orders/[id]/loading';
 
 const ORDER_STATUSES = [
   'PENDING',
@@ -110,7 +111,7 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
   }, [order]);
 
   if (isLoading) {
-    return <div className="p-4 text-center">Loading order details...</div>;
+    return <OrderDetailLoading/>;
   }
 
   if (error) {
