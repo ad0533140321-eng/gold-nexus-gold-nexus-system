@@ -112,3 +112,14 @@ Build and deliver a Phase A MVP for Gold Nexus LLC, a global digital platform fo
 - `[ ]` There is no forgot password flow atm. remove? or implement?
 - `[ ]` Configure production cron job schedule (e.g., every 30 minutes).
 - `[ ]` Final production deployment hand-off.
+
+## 6. Authentication Architecture (Updated)
+
+- **Utility:** `authFetch` (from `@/lib/auth-fetch`) is the standard for all **client-side** API requests.
+- **Behavior:** It wraps the native `fetch`, automatically handling `401 Unauthorized` responses by:
+  1. Pausing the request.
+  2. Calling `/api/auth/refresh` to get a new Access Token & Refresh Token (Rolling Session).
+  3. Retrying the original request.
+  4. Redirecting to `/login` if the refresh fails.
+- **Rule:** ALWAYS use `authFetch` instead of `fetch` in Client Components (`'use client'`).
+- **Exception:** Server Components (which run on Node.js) cannot use `authFetch` as they lack browser context (cookies/window). They continue to use native `fetch` or direct DB calls.

@@ -3,6 +3,11 @@
 
 @custom-variant dark (&:is(.dark *));
 
+html {
+  /*this is a must! without it, when navigating to other pages, the scroll doesnt go all the way to the top and you see half the page.*/
+  scroll-padding-top: 102px;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
