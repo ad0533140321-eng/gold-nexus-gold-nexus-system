@@ -36,6 +36,7 @@ export async function getLeads(
       ...lead,
       photoUrls,
       estimatedValue: lead.estimatedValue ? lead.estimatedValue.toString() : null,
+      estimatedWeight: lead.estimatedWeight.toString(),
     };
   });
 
@@ -72,5 +73,6 @@ export async function getLeadById(id: string) {
     ...lead,
     photoUrls,
     estimatedValue: lead.estimatedValue ? lead.estimatedValue.toString() : null,
+    estimatedWeight: lead.estimatedWeight.toString(),
   };
 }

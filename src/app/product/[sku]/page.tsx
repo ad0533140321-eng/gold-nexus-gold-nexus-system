@@ -1,15 +1,14 @@
 import { notFound } from 'next/navigation';
 import { Product } from '@/generated/prisma/client';
 import Image from 'next/image';
-import { Button } from '@/components/ui/button';
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
-import { formatCurrency } from '@/lib/utils/formatCurrency';
 import { ProductPageActions } from '@/components/ProductPageActions';
+import { formatWeight } from '@/lib/utils/formatWeight';
 
 async function getProduct(sku: string): Promise<Product | null> {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
@@ -65,7 +64,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
               </div>
               <div className="flex justify-between border-b border-border/30 py-3">
                 <dt className="text-muted-foreground">Weight</dt>
-                <dd className="font-semibold text-foreground">{product.weight}</dd>
+                <dd className="font-semibold text-foreground">{formatWeight(product.weight)}</dd>
               </div>
               <div className="flex justify-between border-b border-border/30 py-3">
                 <dt className="text-muted-foreground">Mint / Vendor</dt>
@@ -111,7 +110,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
                 <dl className="mt-4 text-sm">
                   <div className="flex justify-between py-2">
                     <dt>Gross Weight</dt>
-                    <dd>{product.weight || '-'}</dd>
+                    <dd>{formatWeight(product.weight)}</dd>
                   </div>
                   <div className="flex justify-between py-2">
                     <dt>Fineness</dt>

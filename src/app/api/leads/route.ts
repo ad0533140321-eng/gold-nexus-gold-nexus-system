@@ -35,9 +35,9 @@ export async function POST(req: Request) {
 
       const livePricePerGram = Number(goldPriceData.currentPrice) / 31.1035; // Convert from oz to grams. Gold price in the market is for 1 oz, not 1 gram.
       const purity = karatPurities[validatedData.estimatedKarat.toUpperCase()];
-      const weightInGrams = parseFloat(validatedData.estimatedWeight);
+      const weightInGrams = validatedData.estimatedWeight;
 
-      if (purity && !isNaN(weightInGrams)) {
+      if (purity) {
         estimatedValue = livePricePerGram * weightInGrams * purity;
       }
     } catch (priceError) {

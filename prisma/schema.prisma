@@ -62,7 +62,7 @@ model Product {
   name          String
   description   String?         @db.Text
   price         Decimal         @db.Decimal(10, 2)
-  weight        String
+  weight        Decimal         @db.Decimal(10, 2)
   karat         String
   category      ProductCategory
   imageUrl      String
@@ -109,7 +109,7 @@ model SecondHandLead {
   country         String
   city            String
   itemType        String
-  estimatedWeight String
+  estimatedWeight Decimal    @db.Decimal(10, 2)
   estimatedKarat  String
   estimatedValue  Decimal?   @db.Decimal(10, 2)
   photoUrls       Json       @default("[]")

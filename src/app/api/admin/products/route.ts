@@ -20,6 +20,7 @@ const getProductsHandler: AdminApiHandler = async (req) => {
     const serializedData = productsResult.data.map((product) => ({
       ...product,
       price: product.price.toString(),
+      weight: product.weight.toString(),
     }));
 
     return NextResponse.json({
@@ -37,7 +38,7 @@ const productSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   description: z.string().optional(),
   price: z.number().positive('Price must be positive'),
-  weight: z.string().min(1, 'Weight is required'),
+  weight: z.number().positive('Weight must be positive'),
   karat: z.string().min(1, 'Karat is required'),
   category: z.enum(['BAR', 'COIN', 'JEWELRY']),
   imageUrl: z.string().url('Must be a valid URL'),

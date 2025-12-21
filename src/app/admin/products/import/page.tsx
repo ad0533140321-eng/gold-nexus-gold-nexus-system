@@ -131,7 +131,7 @@ export default function ImportPage() {
       'name',
       'description',
       'price',
-      'weight',
+      'weight (g)',
       'karat',
       'category',
       'vendorName',
@@ -143,7 +143,7 @@ export default function ImportPage() {
         '1kg Gold Bar Example',
         'Fine gold bar 99.99% purity',
         '65000.00',
-        '1 kg',
+        '1000',
         '24K',
         'BAR',
         'PAMP Suisse',
@@ -154,7 +154,7 @@ export default function ImportPage() {
         '1oz Gold Coin Example',
         'Beautiful gold coin',
         '2100.50',
-        '1 oz',
+        '31.1',
         '22K',
         'COIN',
         'Royal Mint',
@@ -165,7 +165,7 @@ export default function ImportPage() {
         'Gold Necklace Example',
         'Elegant 18K necklace',
         '1500.00',
-        '15 g',
+        '15',
         '18K',
         'JEWELRY',
         'Gold Nexus',
@@ -291,8 +291,10 @@ export default function ImportPage() {
           <div className="flex items-center justify-between">
             <div>
               <CardTitle>Step 2: Upload Product Data (CSV)</CardTitle>
-              <CardDescription>
-                Upload a CSV file with your product details. SKUs must match the uploaded images.
+              <CardDescription className="pt-2">
+                Upload a CSV file with your product details. SKUs must match the uploaded images.{' '}
+                <br />
+                <strong>Weights must be numeric values in grams only.</strong>
               </CardDescription>
             </div>
             <Button variant="outline" size="sm" onClick={downloadTemplate}>

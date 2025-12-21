@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/select';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
 import LeadDetailLoading from '@/app/admin/leads/[id]/loading';
+import { formatWeight } from '@/lib/utils/formatWeight';
 
 const LEAD_STATUSES = ['SUBMITTED', 'CONTACTED', 'CLOSED'] as const;
 
@@ -29,7 +30,7 @@ type LeadDetail = {
   city: string;
   itemType: string;
   estimatedKarat: string;
-  estimatedWeight: string;
+  estimatedWeight: number;
   estimatedValue: string | null;
   status: string;
   photoUrls: string[];
@@ -127,7 +128,7 @@ export default function LeadDetailPage({ params }: LeadDetailPageProps) {
     City: lead.city,
     'Item Type': lead.itemType,
     'Estimated Karat': lead.estimatedKarat,
-    'Estimated Weight': lead.estimatedWeight ? `${lead.estimatedWeight} grams` : null,
+    'Estimated Weight': formatWeight(lead.estimatedWeight),
     'Submitted At': formatDate(lead.createdAt, { showTime: true }),
     'Last Updated': formatDate(lead.updatedAt, { showTime: true }),
   };

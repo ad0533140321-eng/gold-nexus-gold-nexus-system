@@ -40,7 +40,7 @@ async function main() {
       description:
         'The PAMP Suisse 1 oz gold bar represents the pinnacle of Swiss craftsmanship, featuring the iconic Lady Fortuna design. Each bar is individually assayed and sealed in CertiPAMP™ packaging.',
       price: 2689.5,
-      weight: '1 oz',
+      weight: 31.1,
       karat: '24K',
       category: ProductCategory.BAR,
       imageUrl:
@@ -55,7 +55,7 @@ async function main() {
       description:
         'The official gold bullion coin of the United States, the American Gold Eagle is cherished by investors and collectors alike. Its 22K composition makes it more durable than pure gold coins.',
       price: 2745.0,
-      weight: '1 oz',
+      weight: 31.1,
       karat: '22K',
       category: ProductCategory.COIN,
       imageUrl:
@@ -70,7 +70,7 @@ async function main() {
       description:
         "A benchmark in the precious metals industry, this 1 kg cast bar from the renowned Perth Mint offers a cost-effective way to acquire a substantial amount of gold. Each bar is stamped with the mint's swan logo.",
       price: 84750.0,
-      weight: '1 kg',
+      weight: 1000,
       karat: '24K',
       category: ProductCategory.BAR,
       imageUrl:
@@ -85,7 +85,7 @@ async function main() {
       description:
         "A popular choice for serious investors, the 10 oz Perth Mint gold bar provides a significant store of value with the trust and recognition of one of the world's leading mints.",
       price: 24850.0,
-      weight: '10 oz',
+      weight: 311,
       karat: '24K',
       category: ProductCategory.BAR,
       imageUrl:
@@ -203,7 +203,7 @@ async function main() {
           country: faker.location.country(),
           city: faker.location.city(),
           itemType: faker.helpers.arrayElement(['Jewelry', 'Coin', 'Bar', 'Other']),
-          estimatedWeight: faker.number.int({ min: 5, max: 100 }).toString(),
+          estimatedWeight: faker.number.int({ min: 5, max: 100 }),
           estimatedKarat: faker.helpers.arrayElement(['10K', '14K', '18K', '22K', '24K']),
           estimatedValue: new Decimal(faker.finance.amount({ min: 100, max: 5000 })),
           photoUrls: [faker.helpers.arrayElement(leadImages)],

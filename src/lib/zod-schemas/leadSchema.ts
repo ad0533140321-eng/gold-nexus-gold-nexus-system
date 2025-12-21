@@ -9,7 +9,7 @@ export const leadSchema = z.object({
   itemType: z
     .string()
     .min(2, { message: 'Please describe the item type (e.g., "Gold Bar", "Necklace").' }),
-  estimatedWeight: z.string().min(1, { message: 'Please provide an estimated weight.' }),
+  estimatedWeight: z.number().positive({ message: 'Please provide a valid estimated weight.' }),
   estimatedKarat: z.string().min(1, { message: 'Please provide an estimated karat.' }),
   photoUrls: z.array(z.string()).min(1, { message: 'At least one photo is required.' }),
 });

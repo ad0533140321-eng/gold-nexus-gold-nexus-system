@@ -61,7 +61,7 @@ export default function SellGoldPage() {
       city: '',
       itemType: '',
       estimatedKarat: '',
-      estimatedWeight: '',
+      estimatedWeight: 0 as any, // Start with empty-looking but typed for zod
       photoUrls: [],
     },
   });
@@ -293,9 +293,12 @@ export default function SellGoldPage() {
                   render={({ field }) => (
                     <Input
                       id="estimatedWeight"
+                      type="number"
+                      step="0.01"
                       placeholder="e.g., 100"
-                      {...field}
                       className="mt-1.5"
+                      value={field.value || ''}
+                      onChange={(e) => field.onChange(e.target.valueAsNumber)}
                     />
                   )}
                 />

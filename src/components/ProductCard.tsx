@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Product } from '@/generated/prisma/client';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
+import { formatWeight } from '@/lib/utils/formatWeight';
 import { useCartStore } from '@/lib/store/cart';
 interface ProductCardProps {
   product: Product;
@@ -34,7 +35,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
             {karat}
           </span>
           <span className="font-sans text-xs font-medium text-muted-foreground">
-            Weight: <span className="font-semibold text-foreground">{weight}</span>
+            Weight: <span className="font-semibold text-foreground">{formatWeight(weight)}</span>
           </span>
         </div>
         <h3 className="mb-4 font-serif text-lg font-medium text-foreground">{name}</h3>

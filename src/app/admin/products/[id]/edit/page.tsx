@@ -29,7 +29,7 @@ const productSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   description: z.string().optional(),
   price: z.number().positive('Price must be positive'),
-  weight: z.string().min(1, 'Weight is required'),
+  weight: z.number().positive('Weight must be positive'),
   karat: z.string().min(1, 'Karat is required'),
   category: z.enum(['BAR', 'COIN', 'JEWELRY']),
   imageUrl: z.string().url('Must be a valid URL'),
@@ -164,7 +164,8 @@ export default function EditProductPage() {
               <Trash className="mr-2 h-4 w-4" /> Delete
             </Button>
             <Button
-              onClick={handleSubmit(onSubmit)}
+              type="submit"
+              form="product-form"
               disabled={isSubmitting}
               className="flex-1 bg-black text-white hover:bg-neutral-800 sm:flex-none"
             >
@@ -177,7 +178,7 @@ export default function EditProductPage() {
 
       {error && <div className="rounded-md bg-red-50 p-4 text-sm text-red-500">{error}</div>}
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <form id="product-form" onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           {/* Left Column: Main Info */}
           <div className="space-y-6 md:col-span-2">
@@ -239,8 +240,14 @@ export default function EditProductPage() {
                     {errors.price && <p className="text-xs text-red-500">{errors.price.message}</p>}
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="weight">Weight</Label>
-                    <Input id="weight" {...register('weight')} placeholder="e.g. 1 oz" />
+                    <Label htmlFor="weight">Weight (g)</Label>
+                    <Input
+                      id="weight"
+                      type="number"
+                      step="0.01"
+                      {...register('weight', { valueAsNumber: true })}
+                      placeholder="e.g. 31.1"
+                    />
                     {errors.weight && (
                       <p className="text-xs text-red-500">{errors.weight.message}</p>
                     )}

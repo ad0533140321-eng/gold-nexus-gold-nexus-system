@@ -10,7 +10,7 @@ const productCsvSchema = z.object({
   name: z.string().min(1),
   description: z.string().optional(),
   price: z.string().transform((val) => parseFloat(val)),
-  weight: z.string().min(1),
+  weight: z.string().transform((val) => parseFloat(val)),
   karat: z.string().min(1),
   category: z.enum(['BAR', 'COIN', 'JEWELRY']),
   vendorName: z.string().min(1),

@@ -15,6 +15,7 @@ const getHandler: AdminApiHandler = async (req, context) => {
     return NextResponse.json({
       ...product,
       price: product.price.toString(),
+      weight: product.weight.toString(),
     });
   } catch (error) {
     console.error(`[API/ADMIN/PRODUCTS/[id]] Error fetching product:`, error);
@@ -28,7 +29,7 @@ const productUpdateSchema = z.object({
   name: z.string().min(1, 'Name is required').optional(),
   description: z.string().optional(),
   price: z.number().positive('Price must be positive').optional(),
-  weight: z.string().min(1, 'Weight is required').optional(),
+  weight: z.number().positive('Weight must be positive').optional(),
   karat: z.string().min(1, 'Karat is required').optional(),
   category: z.enum(['BAR', 'COIN', 'JEWELRY']).optional(),
   imageUrl: z.string().url('Must be a valid URL').optional(),
