@@ -62,7 +62,7 @@ export default async function AdminProductsPage({ searchParams }: ProductsPagePr
         <ProductSearch />
       </div>
 
-      <Card className="overflow-hidden p-0">
+      <Card className="max-w-full overflow-hidden p-0">
         <CardContent className="p-0">
           <Table>
             <TableHeader>
