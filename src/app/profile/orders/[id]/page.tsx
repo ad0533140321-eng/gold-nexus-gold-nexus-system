@@ -157,21 +157,24 @@ export default function OrderDetailPage() {
           </CardHeader>
           <CardContent className="divide-y divide-neutral-100 p-0">
             {order.items.map((item) => (
-              <div key={item.id} className="flex items-center gap-4 p-6">
-                <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-md border border-neutral-100 bg-neutral-50">
-                  <Image
-                    src={item.product.imageUrl}
-                    alt={item.product.name}
-                    fill
-                    className="object-cover"
-                  />
+              <div key={item.id} className="flex flex-col gap-4 p-6 sm:flex-row sm:items-center">
+                <div className="flex items-center gap-4">
+                  <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-md border border-neutral-100 bg-neutral-50">
+                    <Image
+                      src={item.product.imageUrl}
+                      alt={item.product.name}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
                 </div>
+
                 <div className="flex flex-grow flex-col">
                   <h4 className="font-medium text-black">{item.product.name}</h4>
                   <p className="text-xs text-neutral-400">SKU: {item.product.sku}</p>
                   <p className="mt-1 text-sm text-neutral-500">Qty: {item.quantity}</p>
                 </div>
-                <div className="text-right">
+                <div className="text-left sm:text-right">
                   <p className="font-semibold text-black">
                     {formatCurrency(Number(item.priceAtPurchase) * item.quantity)}
                   </p>

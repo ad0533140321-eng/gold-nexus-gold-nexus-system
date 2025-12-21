@@ -227,7 +227,10 @@ const CheckoutForm = ({ onOrderPlaced }: { onOrderPlaced: () => void }) => {
             <CardContent className="space-y-6">
               <div className="space-y-4">
                 {items.map((item) => (
-                  <div key={item.id} className="flex items-center justify-between">
+                  <div
+                    key={item.id}
+                    className="flex flex-col items-start justify-between gap-4 border-b border-gray-50 pb-4 last:border-0 last:pb-0 sm:flex-row sm:items-center sm:gap-0"
+                  >
                     <div className="flex items-center gap-4">
                       <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-md border bg-gray-100">
                         <Image src={item.imageUrl} alt={item.name} fill className="object-cover" />
@@ -237,7 +240,7 @@ const CheckoutForm = ({ onOrderPlaced }: { onOrderPlaced: () => void }) => {
                         <p className="text-sm text-neutral-500">Qty: {item.quantity}</p>
                       </div>
                     </div>
-                    <p className="font-semibold">
+                    <p className="font-semibold sm:text-right">
                       {formatCurrency(Number(item.price) * item.quantity)}
                     </p>
                   </div>

@@ -78,7 +78,10 @@ export default function OrderConfirmationPage() {
           <CardContent className="space-y-6 pt-6">
             <div className="space-y-4">
               {order.items.map((item: any) => (
-                <div key={item.id} className="flex items-start justify-between">
+                <div
+                  key={item.id}
+                  className="flex flex-col items-start justify-between gap-4 border-b border-gray-50 pb-4 last:border-0 last:pb-0 sm:flex-row sm:items-center sm:gap-0"
+                >
                   <div className="flex items-center gap-4">
                     <div className="relative h-16 w-16 overflow-hidden rounded-md border border-gray-100 bg-gray-50">
                       <Image
@@ -93,7 +96,7 @@ export default function OrderConfirmationPage() {
                       <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
                     </div>
                   </div>
-                  <p className="font-medium text-gray-900">
+                  <p className="font-medium text-gray-900 sm:text-right">
                     {formatCurrency(Number(item.priceAtPurchase) * item.quantity)}
                   </p>
                 </div>
