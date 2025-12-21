@@ -288,7 +288,7 @@ export default function ImportPage() {
 
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <CardTitle>Step 2: Upload Product Data (CSV)</CardTitle>
               <CardDescription className="pt-2">
@@ -297,7 +297,12 @@ export default function ImportPage() {
                 <strong>Weights must be numeric values in grams only.</strong>
               </CardDescription>
             </div>
-            <Button variant="outline" size="sm" onClick={downloadTemplate}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={downloadTemplate}
+              className="w-full sm:w-auto"
+            >
               Download CSV Template
             </Button>
           </div>
