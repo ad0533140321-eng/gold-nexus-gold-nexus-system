@@ -47,6 +47,15 @@ export default function SellGoldPage() {
     fetchKarats();
   }, []);
 
+  useEffect(() => {
+    if (submissionState.status === 'success') {
+      // Small timeout to ensure the DOM has fully updated and layout shift is complete
+      setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }, 100);
+    }
+  }, [submissionState.status]);
+
   const {
     handleSubmit,
     control,
@@ -124,7 +133,6 @@ export default function SellGoldPage() {
         status: 'success',
         message: 'Your inquiry has been submitted successfully! We will contact you shortly.',
       });
-      window.scrollTo({ top: 0, behavior: 'smooth' });
       // inside onSubmit
     } catch (error) {
       const message =

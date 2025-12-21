@@ -36,75 +36,78 @@ _Goal: Verify high-performance data fetching and unit standardization._
 
 _Goal: Verify the critical market data feed._
 
-- [ ] **Ticker Update**: Refresh the page. Does the Gold Ticker at the top load a price (e.g., ~$2600-2700)? It shouldn't be $0 or "Loading..." forever.
-- [ ] **Mobile View**: Does the ticker look okay on mobile? (No text overflow).
+- [x] **Ticker Update**: Refresh the page. Does the Gold Ticker at the top load a price (e.g., ~$2600-2700)? It shouldn't be $0 or "Loading..." forever.
+- [x] **Mobile View**: Does the ticker look okay on mobile? (No text overflow).
 
 ## 4. Checkout Flow (Pre-Stripe)
 
 _Goal: Verify the order creation logic before payment integration._
 
-- [ ] **Cart to Checkout**: Add an item -> Click Checkout.
-- [ ] **Order Creation**: Fill out the form -> Click "Place Order".
-- [ ] **Success Page**: Do you land on `/order-confirmation/[id]`? Does it show the correct Order ID?
-- [ ] **DB Check**: Go to your Profile -> Orders. Is that new order there?
+- [x] **Cart to Checkout**: Add an item -> Click Checkout.
+- [x] **Order Creation**: Fill out the form -> Click "Place Order".
+- [x] **Success Page**: Do you land on `/order-confirmation/[id]`? Does it show the correct Order ID?
+- [x] **DB Check**: Go to your Profile -> Orders. Is that new order there?
 
 ## 5. Order Management & Tracking
 
 _Goal: Verify the user's post-purchase experience._
 
-- [ ] **Order List**: Navigate to `/profile`. Verify the order history table is populated.
-- [ ] **Row Navigation**: Click an entire row in the Order History table. Verify it navigates to `/profile/orders/[id]`.
-- [ ] **Order Details**:
-  - [ ] Verify the **Progress Tracker** shows the correct status (Placed/Processing/In Transit).
-  - [ ] Verify the **Shipping Address** shows the full address (including State if provided).
-  - [ ] Verify **Line Items** show product images, SKUs, and correct quantities.
-  - [ ] Verify "Each" price only shows if Qty > 1.
-  - [ ] Verify the **Total Sum** matches the purchase.
+- [x] **Order List**: Navigate to `/profile`. Verify the order history table is populated.
+- [x] **Row Navigation**: Click an entire row in the Order History table. Verify it navigates to `/profile/orders/[id]`.
+- [x] **Order Details**:
+  - [x] Verify the **Progress Tracker** shows the correct status (Placed/Processing/In Transit).
+  - [x] Verify the **Shipping Address** shows the full address (including State if provided).
+  - [x] Verify **Line Items** show product images, SKUs, and correct quantities.
+  - [x] Verify "Each" price only shows if Qty > 1.
+  - [x] Verify the **Total Sum** matches the purchase.
 
 ## 6. "Sell Gold" Form (The 'Leads' Fix)
 
 _Goal: Verify the lead generation and data types._
 
-- [ ] **Weight Input**: In the "Sell Your Gold" form, verify the weight input only accepts numbers (since we changed the DB schema to `Decimal`).
-- [ ] **Submission**: Submit a form. Does it redirect to a "Thank You" or show a success Toast?
-- [ ] **Admin View**: Go to `/admin/leads`. Does the new lead appear at the top?
+- [x] **Weight Input**: In the "Sell Your Gold" form, verify the weight input only accepts numbers (since we changed the DB schema to `Decimal`).
+- [x] **Submission**: Submit a form. Does it redirect to a "Thank You" or show a success Toast?
+- [x] **Admin View**: Go to `/admin/leads`. Does the new lead appear at the top?
 
 ## 7. Admin Panel & Bulk Import
 
 _Goal: Verify administrative control and data ingestion._
 
-- [ ] **Admin Navigation**: (Mobile) Open Hamburger menu. Verify "Products", "Orders", and "Leads" links exist.
-- [ ] **Inventory Table**: Verify horizontal scroll works on mobile. Verify the "Featured" column shows badges.
-- [ ] **Product Editing**:
-  - [ ] Edit a product. Toggle **Featured Product**. Verify it saves and then appears in the Homepage "Featured" section.
-  - [ ] Change a weight. Verify the input is a **Number** field and saves as grams.
-- [ ] **Bulk Import**:
-  - [ ] Download the CSV template. Open it and verify the sample weights are numbers (e.g., 1000).
-  - [ ] Upload a CSV with numeric weights. Verify the "Success" report shows the correct count.
-- [ ] **Lead Management**:
-  - [ ] Submit a lead via `/sell-gold` with a numeric weight (e.g., 50).
-  - [ ] View the lead in `/admin/leads/[id]`. Verify the "Estimated Value" is calculated correctly based on the numeric weight.
+- [x] **Admin Navigation**: (Mobile) Open Hamburger menu. Verify "Products", "Orders", and "Leads" links exist.
+- [x] **Inventory Table**: Verify horizontal scroll works on mobile. Verify the "Featured" column shows badges.
+- [x] **Product Editing**:
+  - [x] Edit a product. Toggle **Featured Product**. Verify it saves and then appears in the Homepage "Featured" section.
+  - [x] Change a weight. Verify the input is a **Number** field and saves as grams.
+- [x] **Bulk Import**:
+  - [x] Download the CSV template. Open it and verify the sample weights are numbers (e.g., 1000).
+  - [x] Upload a CSV with numeric weights. Verify the "Success" report shows the correct count.
+- [x] **Lead Management**:
+  - [x] Submit a lead via `/sell-gold` with a numeric weight (e.g., 50).
+  - [x] View the lead in `/admin/leads/[id]`. Verify the "Estimated Value" is calculated correctly based on the numeric weight.
 
 ## 8. Admin Mobile Access (The Bug Fix)
 
 _Goal: Verify the 'Access Denied' race condition is gone._
 
-- [ ] **Mobile Lockout Check**: Log in as Admin on your phone (or simulated mobile view). **Refresh the page.** Do you stay logged in? (This verifies the "race condition" fix).
-- [ ] **Navbar Links**: Open the mobile hamburger menu. Do the "Products", "Orders", "Leads" links actually take you to the right pages?
+- [x] **Mobile Lockout Check**: Log in as Admin on your phone (or simulated mobile view). **Refresh the page.** Do you stay logged in? (This verifies the "race condition" fix).
+- [x] **Navbar Links**: Open the mobile hamburger menu. Do the "Products", "Orders", "Leads" links actually take you to the right pages?
 
 ## 9. Visual Consistency & UI
 
-- [ ] **Custom 404**: Type a random URL (e.g., `/gold-is-cool`). Verify the premium custom 404 page appears.
-- [ ] **Navbar Alignment**: Verify "Buy Gold" and "Sell Gold" are perfectly aligned next to the logo on desktop.
-- [ ] **Responsive Forms**: Check the Add/Edit product headers on mobile. Verify buttons stack below the title.
-- [ ] **Toast Errors**: Trigger a few errors (e.g., invalid SKU). Verify they appear as Toasts, not browser alerts.
+- [x] **Custom 404**: Type a random URL (e.g., `/gold-is-cool`). Verify the premium custom 404 page appears.
+- [x] **Navbar Alignment**: Verify "Buy Gold" and "Sell Gold" are perfectly aligned next to the logo on desktop.
+- [x] **Responsive Forms**: Check the Add/Edit product headers on mobile. Verify buttons stack below the title.
+- [x] **Toast Errors**: Trigger a few errors (e.g., invalid SKU). Verify they appear as Toasts, not browser alerts.
 
 ## 10. Performance & Loading States
 
 _Goal: Verify the 'Premium' feel._
 
-- [ ] **Slow Network Test**: In Chrome DevTools, set Network to "Fast 3G". Navigate to `/marketplace`. Do you see the Skeletons we added? (Instead of a blank white screen).
+- [x] **Slow Network Test**: In Chrome DevTools, set Network to "Fast 3G". Navigate to `/marketplace`. Do you see the Skeletons we added? (Instead of a blank white screen).
 
 ### BUGS FOUND
 
-If i idle on admin, then try to perform bulk import, i get 401 Unauthorized... i think this has to do with the bad token sync or something. how to test this fast? maybe lets do refresh token every 30 seconds for testing?
+- [ ] If i idle on admin, then try to perform bulk import, i get 401 Unauthorized... i think this has to do with the bad token sync or something. how to test this fast? maybe lets do refresh token every 30 seconds for testing?
+- [ ] mobile admin is better but not 100%. i am able to see admin panel after logging in. but if i refresh page after a while i get endless Access Denied in admin layout, even though the app knows im admin (i say this because the hamburger menu shows me the admin links..). if i logout and login again, i can access the admin pages again.
+- [x] on mobile, checkout confirm and my /profile/order layout is bad, the image should be on top of the text of the item. In order confirmed screen, add some padding/margin between the line item price and text (like 4 or 8 px)
+- [x] the scrolling is awful. when i navigate to a different link, i expect it to take me to the top of the page... for example i do sell gold, i submit inquiry, then it jumps to thank you state, instead of seeing that, i see the footer... (beause i had to scroll to fill out the whole form which is more than a screen long on phone)
