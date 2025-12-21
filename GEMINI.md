@@ -97,10 +97,11 @@ Build and deliver a Phase A MVP for Gold Nexus LLC, a global digital platform fo
 - `[x]` **Editable User Profile:**
   - `[x]` Build `PUT /api/users/me` endpoint and enable the "Save Changes" form.
 - `[x]` add pagination (infi scroll) in live market (probably needs some BE work as well)
-- `[ ]` **create a custom 404 page?**
+- `[x]` **create a custom 404 page?**
 - `[ ]` **admin panel is seen on mobile in navbar but im fully locked out on mobile?? no matter how much i refresh??**
 - `[x]` **fix gold price. it barely updates. maybe set up a cron job on cron-job.org?**
 - `[x]` **navbar - buy gold and sell gold are not visually aligned to the page.. fix it**
+- `[x]` **create detailed order page for customer**
 
 ### MILESTONE 4: Stripe, Emails & Full Deployment
 

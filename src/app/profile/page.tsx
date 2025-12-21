@@ -18,6 +18,7 @@ import { CountryDropdown, Country } from '@/components/ui/country-dropdown';
 import { countries } from 'country-data-list';
 import { Pencil, X } from 'lucide-react';
 import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
 import { UserProfile, OrderWithItems } from '@/lib/types';
 import { getOrderStatusVariant } from '@/lib/statusUtils';
@@ -29,6 +30,7 @@ export default function MyAccountPage() {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   // Edit states
   const [isEditing, setIsEditing] = useState(false);
@@ -241,7 +243,11 @@ export default function MyAccountPage() {
                   </TableHeader>
                   <TableBody>
                     {user.orders.map((order: OrderWithItems) => (
-                      <TableRow key={order.id} className="border-neutral-200">
+                      <TableRow
+                        key={order.id}
+                        className="cursor-pointer border-neutral-200 hover:bg-neutral-50"
+                        onClick={() => router.push(`/profile/orders/${order.id}`)}
+                      >
                         <TableCell className="font-medium">#{order.displayId}</TableCell>
                         <TableCell className="text-neutral-600">
                           {formatDate(order.createdAt)}
