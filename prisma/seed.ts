@@ -38,7 +38,41 @@ async function main() {
   }
   console.log('Karat seeding finished.');
 
-  const products = [
+  const BAR_IMAGES = [
+    'https://ctaiwooelzfacgkukunb.supabase.co/storage/v1/object/public/gold-nexus-images/1-oz.png',
+    'https://ctaiwooelzfacgkukunb.supabase.co/storage/v1/object/public/gold-nexus-images/1-kg.png',
+    'https://ctaiwooelzfacgkukunb.supabase.co/storage/v1/object/public/gold-nexus-images/10-oz.png',
+  ];
+  const COIN_IMAGES = [
+    'https://ctaiwooelzfacgkukunb.supabase.co/storage/v1/object/public/gold-nexus-images/coin.png',
+  ];
+  const JEWELRY_IMAGES = [
+    'https://ctaiwooelzfacgkukunb.supabase.co/storage/v1/object/public/gold-nexus-images/TEST-JEWELRY-1.png',
+  ];
+
+  const categoryImageMap: Record<ProductCategory, string[]> = {
+    [ProductCategory.BAR]: BAR_IMAGES,
+    [ProductCategory.COIN]: COIN_IMAGES,
+    [ProductCategory.JEWELRY]: JEWELRY_IMAGES,
+  };
+
+  // Define a type that matches the Prisma Product create input
+  type ProductCreateInput = {
+    sku: string;
+    name: string;
+    description: string;
+    price: number;
+    weight: number;
+    karat: string;
+    category: ProductCategory;
+    imageUrl: string;
+    vendorName: string;
+    stockStatus: StockStatus;
+    isActive: boolean;
+    isFeatured: boolean;
+  };
+
+  const baseProducts: ProductCreateInput[] = [
     {
       sku: 'GNB-PAMP-1OZ',
       name: '1 oz PAMP Suisse Gold Bar',
@@ -48,11 +82,11 @@ async function main() {
       weight: 31.1,
       karat: '24K',
       category: ProductCategory.BAR,
-      imageUrl:
-        'https://ctaiwooelzfacgkukunb.supabase.co/storage/v1/object/public/gold-nexus-images/1-oz.png',
+      imageUrl: BAR_IMAGES[0],
       vendorName: 'PAMP Suisse',
       stockStatus: StockStatus.IN_STOCK,
       isActive: true,
+      isFeatured: true,
     },
     {
       sku: 'GNC-EAGLE-1OZ',
@@ -63,11 +97,11 @@ async function main() {
       weight: 31.1,
       karat: '22K',
       category: ProductCategory.COIN,
-      imageUrl:
-        'https://ctaiwooelzfacgkukunb.supabase.co/storage/v1/object/public/gold-nexus-images/coin.png',
+      imageUrl: COIN_IMAGES[0],
       vendorName: 'US Mint',
       stockStatus: StockStatus.IN_STOCK,
       isActive: true,
+      isFeatured: true,
     },
     {
       sku: 'GNB-PERTH-1KG',
@@ -78,11 +112,11 @@ async function main() {
       weight: 1000,
       karat: '24K',
       category: ProductCategory.BAR,
-      imageUrl:
-        'https://ctaiwooelzfacgkukunb.supabase.co/storage/v1/object/public/gold-nexus-images/1-kg.png',
+      imageUrl: BAR_IMAGES[1],
       vendorName: 'Perth Mint',
       stockStatus: StockStatus.IN_STOCK,
       isActive: true,
+      isFeatured: true,
     },
     {
       sku: 'GNB-PERTH-10OZ',
@@ -93,24 +127,49 @@ async function main() {
       weight: 311,
       karat: '24K',
       category: ProductCategory.BAR,
-      imageUrl:
-        'https://ctaiwooelzfacgkukunb.supabase.co/storage/v1/object/public/gold-nexus-images/10-oz.png',
+      imageUrl: BAR_IMAGES[2],
       vendorName: 'Perth Mint',
       stockStatus: StockStatus.IN_STOCK,
       isActive: true,
+      isFeatured: true,
     },
   ];
 
-  for (const productData of products) {
-    const product = await prisma.product.upsert({
-      where: { sku: productData.sku },
-      update: {},
-      create: productData,
+  const allProducts: ProductCreateInput[] = [...baseProducts];
+
+  // Generate 97 more products to reach 101 total
+  for (let i = 1; i <= 97; i++) {
+    const category = faker.helpers.arrayElement(Object.values(ProductCategory));
+    const imageUrl = faker.helpers.arrayElement(categoryImageMap[category]);
+    const karat = faker.helpers.arrayElement(['10K', '14K', '18K', '22K', '24K']);
+
+    allProducts.push({
+      sku: `GN-${category.substring(0, 1)}-${faker.string.alphanumeric(8).toUpperCase()}`,
+      name: `${faker.commerce.productAdjective()} ${karat} Gold ${category.toLowerCase()}`,
+      description: faker.commerce.productDescription(),
+      price: parseFloat(faker.commerce.price({ min: 1000, max: 95000 })),
+      weight: faker.number.float({ min: 1, max: 2000, fractionDigits: 2 }),
+      karat: karat,
+      category: category,
+      imageUrl: imageUrl,
+      vendorName: faker.company.name(),
+      stockStatus: StockStatus.IN_STOCK,
+      isActive: true,
+      isFeatured: false,
     });
-    console.log(`Upserted product with id: ${product.id}`);
   }
 
-  console.log('Seeding finished for products.');
+  for (const productData of allProducts) {
+    const product = await prisma.product.upsert({
+      where: { sku: productData.sku },
+      update: {
+        isFeatured: productData.isFeatured,
+      },
+      create: productData,
+    });
+  }
+
+  console.log('Seeding finished for 101 products.');
 
   console.log('Upserting test user...');
   const user = await prisma.user.upsert({
@@ -133,10 +192,10 @@ async function main() {
 
   console.log('Seeding 58 orders...');
 
-  // Fetch a product to link to order items
-  const seedProduct = await prisma.product.findFirst();
+  // Fetch all products to link to order items
+  const productsInDb = await prisma.product.findMany();
 
-  if (seedProduct) {
+  if (productsInDb.length > 0) {
     const orderPromises = [];
     for (let i = 1; i <= 58; i++) {
       // Create a fake user for each order to have realistic names in the order list
@@ -152,6 +211,7 @@ async function main() {
       });
 
       const orderStatus = faker.helpers.arrayElement(['COMPLETED', 'PROCESSING', 'PENDING']);
+      const randomProduct = faker.helpers.arrayElement(productsInDb);
 
       orderPromises.push(
         prisma.order.create({
@@ -169,9 +229,9 @@ async function main() {
             },
             items: {
               create: {
-                productId: seedProduct.id,
+                productId: randomProduct.id,
                 quantity: faker.number.int({ min: 1, max: 5 }),
-                priceAtPurchase: seedProduct.price,
+                priceAtPurchase: randomProduct.price,
               },
             },
           },

@@ -131,7 +131,7 @@ export default function ImportPage() {
       'name',
       'description',
       'price',
-      'weight (g)',
+      'weight',
       'karat',
       'category',
       'vendorName',
