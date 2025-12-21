@@ -11,7 +11,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Periodically check auth to keep the session alive (refresh token if needed)
     // Production: 14 minutes interval for 15m token expiry
     const interval = setInterval(
-      () => {
+      async () => {
+        // Force a token refresh to extend the session
+        await fetch('/api/auth/refresh', { method: 'POST' });
+        // Then update the UI state
         checkAuth();
       },
       14 * 60 * 1000
