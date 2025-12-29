@@ -9,6 +9,12 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/storage/v1/object/public/**', // This allows all images from your public storage
       },
+      {
+        protocol: 'https',
+        hostname: 'hduwnmepfmibxuyfkhtf.supabase.co', // Production Supabase
+        port: '',
+        pathname: '/storage/v1/object/public/**',
+      },
     ],
   },
 };
