@@ -4,6 +4,9 @@ import { PrivacyContent } from './info-pages-content/PrivacyContent';
 import { RefundContent } from './info-pages-content/RefundContent';
 import { ShippingContent } from './info-pages-content/ShippingContent';
 import { ContactContent } from './info-pages-content/ContactContent';
+import { ComplianceContent } from './info-pages-content/compliance';
+import { AISupportContent } from './info-pages-content/ai-support';
+import { FAQContent } from './info-pages-content/faq';
 
 interface PageContent {
   title: string;
@@ -28,7 +31,7 @@ export const pages: Record<string, PageContent> = {
   // Support Slugs
   'ai-support': {
     title: 'AI Customer Service',
-    content: <PlaceholderContent title="AI Customer Service" />,
+    content: <AISupportContent />,
   },
   'support-ticket': {
     title: 'Open Support Ticket',
@@ -36,7 +39,7 @@ export const pages: Record<string, PageContent> = {
   },
   faq: {
     title: 'FAQ & Knowledge Base',
-    content: <PlaceholderContent title="FAQ" />,
+    content: <FAQContent />,
   },
   contact: {
     title: 'Contact Information',
@@ -139,7 +142,7 @@ export const pages: Record<string, PageContent> = {
   },
   compliance: {
     title: 'Compliance & Regulation',
-    content: <PlaceholderContent title="Compliance Standards" />,
+    content: <ComplianceContent />,
   },
   'aml-kyc': {
     title: 'AML / KYC Policy',
