@@ -5,6 +5,7 @@ import localFont from 'next/font/local';
 import { Navbar } from '@/components/navbar';
 import { Footer } from '@/components/Footer';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
+import Script from 'next/script';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -45,6 +46,19 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${tiempos.variable} antialiased`}
       >
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=AW-17896662043"
+          strategy="afterInteractive"
+        />
+        <Script id="google-ads-tag" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'AW-17896662043');
+          `}
+        </Script>
         <AuthProvider>
           <NuqsAdapter>
             <Navbar />

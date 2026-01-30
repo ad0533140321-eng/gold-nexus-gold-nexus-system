@@ -51,6 +51,19 @@ export default function OrderConfirmationPage() {
     fetchOrder();
   }, [id, router]);
 
+  useEffect(() => {
+    if (order) {
+      if (typeof window !== 'undefined' && (window as any).gtag) {
+        (window as any).gtag('event', 'conversion', {
+          send_to: 'AW-17896662043/OpPHCN_JweobEJvI5dVC',
+          value: Number(order.totalAmount),
+          currency: 'USD',
+          transaction_id: order.displayId,
+        });
+      }
+    }
+  }, [order]);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-[#F9F9F9] px-4 py-20">
