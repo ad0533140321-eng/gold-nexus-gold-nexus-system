@@ -21,6 +21,13 @@ export function ProductPageActions({ product }: ProductPageActionsProps) {
       <Button size="lg" className="mt-6 w-full font-bold" onClick={() => addItem(product)}>
         Add to Order
       </Button>
+      <div className="mt-4 flex flex-col items-center gap-1 text-center text-xs text-muted-foreground sm:flex-row sm:justify-center sm:gap-2">
+        <span>U.S. registered company</span>
+        <span className="hidden sm:inline">•</span>
+        <span>Secure checkout</span>
+        <span className="hidden sm:inline">•</span>
+        <span>Insured U.S. shipping</span>
+      </div>
     </div>
   );
 }

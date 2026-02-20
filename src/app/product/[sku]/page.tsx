@@ -24,6 +24,27 @@ interface ProductDetailPageProps {
   params: Promise<{ sku: string }>;
 }
 
+const staticReviews = [
+  {
+    rating: 5,
+    text: 'Secure checkout and fast response.',
+    author: 'Michael R.',
+    location: 'NY',
+  },
+  {
+    rating: 5,
+    text: 'Clear process and professional communication.',
+    author: 'Daniel S.',
+    location: 'CA',
+  },
+  {
+    rating: 5,
+    text: 'Smooth ordering experience and transparent pricing.',
+    author: 'Alex T.',
+    location: 'FL',
+  },
+];
+
 export default async function ProductDetailPage({ params }: ProductDetailPageProps) {
   const { sku } = await params;
   const product = await getProduct(sku);
@@ -79,6 +100,28 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
 
           {/* PRICE & CTA */}
           <ProductPageActions product={product} />
+
+          {/* CUSTOMER FEEDBACK */}
+          <div className="mt-12">
+            <h3 className="font-serif text-lg font-medium text-foreground">Customer Feedback</h3>
+            <div className="mt-6 flex flex-col space-y-4 lg:flex-row lg:gap-4 lg:space-y-0">
+              {staticReviews.map((review, idx) => (
+                <div key={idx} className="flex-1 rounded-lg border border-border/30 bg-card p-4">
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: review.rating }).map((_, i) => (
+                      <span key={i} className="text-yellow-500">
+                        ★
+                      </span>
+                    ))}
+                  </div>
+                  <p className="mt-2 text-sm text-foreground">{review.text}</p>
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    {review.author}, {review.location}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 

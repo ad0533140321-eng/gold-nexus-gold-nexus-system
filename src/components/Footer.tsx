@@ -269,8 +269,30 @@ export const Footer = () => {
         </div>
 
         {/* BOTTOM COPYRIGHT (Shared) */}
-        <div className="mt-12 border-t border-gray-800 pt-8 text-center md:mt-16">
-          <p className="text-xs text-gray-600">&copy; 2025 Gold Nexus LLC. All rights reserved.</p>
+        <div className="mt-12 border-t border-gray-800 pt-8">
+          {/* TRUST BADGES */}
+          <div className="mb-8 flex flex-wrap justify-center gap-8">
+            <div className="flex flex-col items-center gap-2">
+              <div className="text-2xl">🔒</div>
+              <span className="text-center text-xs font-medium text-gray-300">
+                Stripe Secure Checkout
+              </span>
+            </div>
+            <div className="flex flex-col items-center gap-2">
+              <div className="text-2xl">🛡️</div>
+              <span className="text-center text-xs font-medium text-gray-300">SSL Secure</span>
+            </div>
+            <div className="flex flex-col items-center gap-2">
+              <div className="text-2xl">📦</div>
+              <span className="text-center text-xs font-medium text-gray-300">
+                Insured & Tracked Shipping
+              </span>
+            </div>
+          </div>
+
+          <p className="text-center text-xs text-gray-600">
+            &copy; {new Date().getFullYear()} Gold Nexus LLC. All rights reserved.
+          </p>
         </div>
       </div>
     </footer>
