@@ -21,6 +21,11 @@ export function ProductPageActions({ product }: ProductPageActionsProps) {
       <Button size="lg" className="mt-6 w-full font-bold" onClick={() => addItem(product)}>
         Add to Order
       </Button>
+      {product.category === 'BAR' && Number(product.weight) === 10 && (
+        <p className="mt-2 text-center text-xs font-medium text-green-600">
+          Use coupon code FIRSTGOLD50 for $50 off your first order
+        </p>
+      )}
       <div className="mt-4 flex flex-col items-center gap-1 text-center text-xs text-muted-foreground sm:flex-row sm:justify-center sm:gap-2">
         <span>U.S. registered company</span>
         <span className="hidden sm:inline">•</span>

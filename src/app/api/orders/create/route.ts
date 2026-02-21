@@ -14,6 +14,7 @@ const cartItemSchema = z.object({
 const orderCreationSchema = z.object({
   shippingAddress: shippingSchema,
   cartItems: z.array(cartItemSchema).min(1),
+  couponCode: z.string().optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -38,7 +39,7 @@ export async function POST(req: NextRequest) {
       { status: 400 }
     );
   }
-  const { shippingAddress, cartItems } = validation.data;
+  const { shippingAddress, cartItems, couponCode } = validation.data;
 
   try {
     // 3. Server-Side Price Verification
@@ -59,10 +60,36 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const totalAmount = cartItems.reduce((acc, item) => {
+    let totalAmount = cartItems.reduce((acc, item) => {
       const product = productsFromDb.find((p) => p.id === item.id)!;
       return acc + product.price.toNumber() * item.quantity;
     }, 0);
+
+    // --- COUPON LOGIC (Hardcoded for "FIRSTGOLD50") ---
+    let discount = 0;
+    if (couponCode === 'FIRSTGOLD50') {
+      // 1. Check if user has previous successful orders
+      // We only count orders that are PAID, PROCESSING, SHIPPED, or COMPLETED
+      const previousOrdersCount = await prisma.order.count({
+        where: {
+          userId: userId,
+          status: { in: ['PAID', 'PROCESSING', 'SHIPPED', 'COMPLETED'] },
+        },
+      });
+
+      if (previousOrdersCount === 0) {
+        // 2. Check if cart has a 10g BAR
+        // We look for any product in the cart that is a BAR and has weight 10
+        const hasQualifyingItem = productsFromDb.some(
+          (p) => p.category === 'BAR' && p.weight.toNumber() === 10
+        );
+
+        if (hasQualifyingItem) {
+          discount = 50;
+          totalAmount = Math.max(0, totalAmount - discount);
+        }
+      }
+    }
 
     // 4. Create Stripe PaymentIntent
     // Stripe expects amount in cents
@@ -74,6 +101,8 @@ export async function POST(req: NextRequest) {
       metadata: {
         userId: userId,
         userEmail: user.email,
+        couponCode: couponCode || null,
+        discountApplied: discount > 0 ? 'true' : 'false',
       },
       automatic_payment_methods: {
         enabled: true,

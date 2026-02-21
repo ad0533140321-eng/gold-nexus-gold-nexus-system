@@ -70,6 +70,27 @@ export default function CheckoutPage() {
 
 // --- SUB-COMPONENTS ---
 
+const COUPONS: Record<
+  string,
+  {
+    discount: number;
+    isEligible: (items: any[], userOrders: any[]) => boolean;
+    errorMessage: string;
+  }
+> = {
+  FIRSTGOLD50: {
+    discount: 50,
+    isEligible: (items, userOrders) => {
+      const hasItem = items.some((item) => item.category === 'BAR' && Number(item.weight) === 10);
+      const hasPriorOrders = userOrders.some((order) =>
+        ['PAID', 'PROCESSING', 'SHIPPED', 'COMPLETED'].includes(order.status)
+      );
+      return hasItem && !hasPriorOrders;
+    },
+    errorMessage: 'This coupon is valid for 10g Gold Bars on your first order only.',
+  },
+};
+
 const CheckoutForm = ({
   onOrderPlaced,
   orderData,
@@ -80,7 +101,26 @@ const CheckoutForm = ({
   setOrderData: (data: { orderId: string; clientSecret: string } | null) => void;
 }) => {
   const { items } = useCartStore();
+  const { user } = useAuthStore();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [couponCode, setCouponCode] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
+  const [discountAmount, setDiscountAmount] = useState(0);
+
+  // Re-validate coupon when items change
+  useEffect(() => {
+    if (appliedCoupon && COUPONS[appliedCoupon]) {
+      const coupon = COUPONS[appliedCoupon];
+      const userOrders = (user as any)?.orders || [];
+
+      if (!coupon.isEligible(items, userOrders)) {
+        setAppliedCoupon(null);
+        setDiscountAmount(0);
+        setCouponCode('');
+        toast.error(`Coupon removed: ${coupon.errorMessage}`);
+      }
+    }
+  }, [items, appliedCoupon, user]);
 
   const {
     register,
@@ -92,7 +132,26 @@ const CheckoutForm = ({
   });
 
   const subtotal = items.reduce((acc, item) => acc + Number(item.price) * item.quantity, 0);
-  const total = subtotal;
+  const total = subtotal - discountAmount;
+
+  const handleApplyCoupon = () => {
+    if (!couponCode) return;
+    const code = couponCode.toUpperCase();
+    const coupon = COUPONS[code];
+
+    if (coupon) {
+      const userOrders = (user as any)?.orders || [];
+      if (coupon.isEligible(items, userOrders)) {
+        setAppliedCoupon(code);
+        setDiscountAmount(coupon.discount);
+        toast.success('Coupon applied successfully!');
+      } else {
+        toast.error(coupon.errorMessage);
+      }
+    } else {
+      toast.error('Invalid coupon code.');
+    }
+  };
 
   const onCreateOrder = async (data: ShippingFormValues) => {
     setIsProcessing(true);
@@ -102,6 +161,7 @@ const CheckoutForm = ({
           ...data,
         },
         cartItems: items.map((item) => ({ id: item.id, quantity: item.quantity })),
+        couponCode: appliedCoupon,
       };
 
       const res = await authFetch('/api/orders/create', {
@@ -288,12 +348,36 @@ const CheckoutForm = ({
                     </p>
                   )}
                 </div>
+
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Coupon code"
+                    value={couponCode}
+                    onChange={(e) => setCouponCode(e.target.value)}
+                    disabled={!!appliedCoupon}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleApplyCoupon}
+                    disabled={!couponCode || !!appliedCoupon}
+                  >
+                    Apply
+                  </Button>
+                </div>
+
                 <Separator />
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm text-neutral-600">
                     <span>Subtotal</span>
                     <span>{formatCurrency(subtotal)}</span>
                   </div>
+                  {discountAmount > 0 && appliedCoupon && (
+                    <div className="flex justify-between text-sm font-medium text-green-600">
+                      <span>Discount ({appliedCoupon.toUpperCase()})</span>
+                      <span>-{formatCurrency(discountAmount)}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between text-sm text-neutral-600">
                     <span>Shipping</span>
                     <span>Free</span>
