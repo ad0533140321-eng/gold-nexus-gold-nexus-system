@@ -24,6 +24,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { ConfirmActionModal } from '@/components/admin/confirm-action-modal';
 import ProductEditLoading from '@/app/admin/products/[id]/edit/loading';
 import { authFetch } from '@/lib/auth-fetch';
+import { ProductImageUpload } from '@/components/admin/product-image-upload';
 
 const productSchema = z.object({
   sku: z.string().min(1, 'SKU is required'),
@@ -62,12 +63,14 @@ export default function EditProductPage() {
     control,
     reset,
     watch,
+    setValue,
   } = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
   });
 
-  // Watch imageUrl for preview
+  // Watch for values needed by upload component
   const imageUrlValue = watch('imageUrl');
+  const productSku = watch('sku');
 
   useEffect(() => {
     if (!id) return;
@@ -359,27 +362,23 @@ export default function EditProductPage() {
                 <CardTitle>Product Image</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
+                <ProductImageUpload
+                  sku={productSku}
+                  value={imageUrlValue}
+                  onChange={(url) =>
+                    setValue('imageUrl', url, { shouldDirty: true, shouldValidate: true })
+                  }
+                />
+
                 <div className="space-y-2">
                   <Label htmlFor="imageUrl">Image URL</Label>
                   <Input id="imageUrl" {...register('imageUrl')} placeholder="https://..." />
                   {errors.imageUrl && (
                     <p className="text-xs text-red-500">{errors.imageUrl.message}</p>
                   )}
-                </div>
-                {/* Simple Preview */}
-                <div className="aspect-square w-full overflow-hidden rounded-md border bg-muted">
-                  {imageUrlValue ? (
-                    <img
-                      src={imageUrlValue}
-                      alt="Preview"
-                      className="h-full w-full object-contain"
-                      onError={(e) => (e.currentTarget.src = '')}
-                    />
-                  ) : (
-                    <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
-                      No Image Preview
-                    </div>
-                  )}
+                  <p className="text-[10px] text-muted-foreground">
+                    URL will update automatically when you upload a new file.
+                  </p>
                 </div>
               </CardContent>
             </Card>
